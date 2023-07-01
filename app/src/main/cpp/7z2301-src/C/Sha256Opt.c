@@ -320,7 +320,7 @@ void Z7_FASTCALL Sha256_UpdateBlocks_HW(UInt32 state[8], const Byte *data, size_
     R16 ( 1, SM1, SM2, SM1, SM2, SM1, SM2, SM1, SM2 );
     R16 ( 2, SM1, SM2, SM1, SM2, SM1, SM2, SM1, SM2 );
     R16 ( 3, SM1, SM2, NNN, SM2, NNN, NNN, NNN, NNN );
-    
+
     state0 = vaddq_u32(state0, state0_save);
     state1 = vaddq_u32(state1, state1_save);
     
@@ -345,7 +345,7 @@ void Z7_FASTCALL Sha256_UpdateBlocks_HW(UInt32 state[8], const Byte *data, size_
 // #include "Sha256.h"
 void Z7_FASTCALL Sha256_UpdateBlocks(UInt32 state[8], const Byte *data, size_t numBlocks);
 
-#pragma message("Sha256 HW-SW stub was used")
+//#pragma message("Sha256 HW-SW stub was used")
 
 void Z7_FASTCALL Sha256_UpdateBlocks_HW(UInt32 state[8], const Byte *data, size_t numBlocks);
 void Z7_FASTCALL Sha256_UpdateBlocks_HW(UInt32 state[8], const Byte *data, size_t numBlocks)

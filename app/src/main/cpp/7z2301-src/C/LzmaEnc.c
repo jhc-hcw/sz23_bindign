@@ -195,7 +195,7 @@ unsigned GetPosSlot1(UInt32 pos);
 unsigned GetPosSlot1(UInt32 pos)
 {
   unsigned res;
-  BSR2_RET(pos, res);
+  BSR2_RET(pos, res)
   return res;
 }
 #define GetPosSlot2(pos, res) { BSR2_RET(pos, res); }

@@ -70,7 +70,7 @@ static Byte InvS[256];
     #endif
   #endif
 #endif
-
+#undef USE_HW_AES
 #ifdef USE_HW_AES
 #ifdef Z7_SHOW_AES_STATUS
 #include <stdio.h>

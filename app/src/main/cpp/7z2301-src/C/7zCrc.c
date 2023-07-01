@@ -174,7 +174,7 @@ ATTRIB_CRC
 UInt32 Z7_FASTCALL CrcUpdateT0_32(UInt32 v, const void *data, size_t size, const UInt32 *table)
 {
   const Byte *p = (const Byte *)data;
-  UNUSED_VAR(table);
+  UNUSED_VAR(table)
 
   for (; size != 0 && ((unsigned)(ptrdiff_t)p & (T0_32_UNROLL_BYTES - 1)) != 0; size--)
     v = __crc32b(v, *p++);
@@ -206,7 +206,7 @@ ATTRIB_CRC
 UInt32 Z7_FASTCALL CrcUpdateT0_64(UInt32 v, const void *data, size_t size, const UInt32 *table)
 {
   const Byte *p = (const Byte *)data;
-  UNUSED_VAR(table);
+  UNUSED_VAR(table)
 
   for (; size != 0 && ((unsigned)(ptrdiff_t)p & (T0_64_UNROLL_BYTES - 1)) != 0; size--)
     v = __crc32b(v, *p++);

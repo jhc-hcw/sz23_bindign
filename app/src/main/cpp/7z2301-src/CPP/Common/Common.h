@@ -304,7 +304,7 @@ _Pragma("GCC diagnostic pop")
 #else // Z7_REDEFINE_NULL
 
 #if defined(__clang__) && __clang_major__ >= 5
-#pragma GCC diagnostic ignored "-Wzero-as-null-pointer-constant"
+//#pragma GCC diagnostic ignored "-Wzero-as-null-pointer-constant"
 #endif
 
 #endif // Z7_REDEFINE_NULL

@@ -169,7 +169,7 @@ Z7_COM7F_IMF2(UInt32, CAesCtrCoder::Filter(Byte *data, UInt32 size))
     #endif
   #endif
 #endif
-
+#undef USE_HW_AES
 #ifdef USE_HW_AES
     #define SET_AES_FUNC_2(f2) \
       if (algo == 2) if (g_Aes_SupportedFunctions_Flags & k_Aes_SupportedFunctions_HW) \

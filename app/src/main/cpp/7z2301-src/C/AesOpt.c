@@ -8,40 +8,40 @@
 
 #ifdef MY_CPU_X86_OR_AMD64
 
-  #if defined(__INTEL_COMPILER)
-    #if (__INTEL_COMPILER >= 1110)
-      #define USE_INTEL_AES
-      #if (__INTEL_COMPILER >= 1900)
-        #define USE_INTEL_VAES
-      #endif
-    #endif
-  #elif defined(__clang__) && (__clang_major__ > 3 || __clang_major__ == 3 && __clang_minor__ >= 8) \
+#if defined(__INTEL_COMPILER)
+#if (__INTEL_COMPILER >= 1110)
+#define USE_INTEL_AES
+#if (__INTEL_COMPILER >= 1900)
+#define USE_INTEL_VAES
+#endif
+#endif
+#elif defined(__clang__) && (__clang_major__ > 3 || __clang_major__ == 3 && __clang_minor__ >= 8) \
        || defined(__GNUC__) && (__GNUC__ > 4 || __GNUC__ == 4 && __GNUC_MINOR__ >= 4)
-        #define USE_INTEL_AES
-        #if !defined(__AES__)
-          #define ATTRIB_AES __attribute__((__target__("aes")))
-        #endif
-      #if defined(__clang__) && (__clang_major__ >= 8) \
+#define USE_INTEL_AES
+#if !defined(__AES__)
+#define ATTRIB_AES __attribute__((__target__("aes")))
+#endif
+#if defined(__clang__) && (__clang_major__ >= 8) \
           || defined(__GNUC__) && (__GNUC__ >= 8)
-        #define USE_INTEL_VAES
-        #if !defined(__AES__) || !defined(__VAES__) || !defined(__AVX__) || !defined(__AVX2__)
-          #define ATTRIB_VAES __attribute__((__target__("aes,vaes,avx,avx2")))
-        #endif
-      #endif
-  #elif defined(_MSC_VER)
-    #if (_MSC_VER > 1500) || (_MSC_FULL_VER >= 150030729)
-      #define USE_INTEL_AES
-      #if (_MSC_VER >= 1910)
-        #define USE_INTEL_VAES
-      #endif
-    #endif
-  #endif
+#define USE_INTEL_VAES
+#if !defined(__AES__) || !defined(__VAES__) || !defined(__AVX__) || !defined(__AVX2__)
+#define ATTRIB_VAES __attribute__((__target__("aes,vaes,avx,avx2")))
+#endif
+#endif
+#elif defined(_MSC_VER)
+#if (_MSC_VER > 1500) || (_MSC_FULL_VER >= 150030729)
+#define USE_INTEL_AES
+#if (_MSC_VER >= 1910)
+#define USE_INTEL_VAES
+#endif
+#endif
+#endif
 
 #ifndef ATTRIB_AES
-  #define ATTRIB_AES
+#define ATTRIB_AES
 #endif
 #ifndef ATTRIB_VAES
-  #define ATTRIB_VAES
+#define ATTRIB_VAES
 #endif
 
 
@@ -122,11 +122,11 @@ AES_FUNC_START2 (AesCbc_Encode_HW)
 */
 
 #ifdef MY_CPU_AMD64
-  #define NUM_WAYS      8
-  #define WOP_M1    WOP_8
+#define NUM_WAYS      8
+#define WOP_M1    WOP_8
 #else
-  #define NUM_WAYS      4
-  #define WOP_M1    WOP_4
+#define NUM_WAYS      4
+#define WOP_M1    WOP_4
 #endif
 
 #define WOP(op)  op (m0, 0)  WOP_M1(op)
@@ -223,11 +223,11 @@ AES_FUNC_START2 (AesCbc_Decode_HW)
   const __m128i *wStart = p + *(const UInt32 *)(p + 1) * 2 + 2 - 1;
   const __m128i *dataEnd;
   p += 2;
-  
+
   WIDE_LOOP_START
   {
     const __m128i *w = wStart;
-    
+
     WOP (DECLARE_VAR)
     WOP (LOAD_data)
     WOP_KEY (AES_XOR, 1)
@@ -265,7 +265,7 @@ AES_FUNC_START2 (AesCbc_Decode_HW)
     iv = *data;
     *data = m;
   }
-  
+
   p[-2] = iv;
 }
 
@@ -280,7 +280,7 @@ AES_FUNC_START2 (AesCtr_Code_HW)
   __m128i one = _mm_cvtsi32_si128(1);
 
   p += 2;
-  
+
   WIDE_LOOP_START
   {
     const __m128i *w = p;
@@ -296,7 +296,7 @@ AES_FUNC_START2 (AesCtr_Code_HW)
     }
     while (--r);
     WOP_KEY (AES_ENC_LAST, 0)
-   
+
     WOP (CTR_END)
   }
   WIDE_LOOP_END
@@ -320,7 +320,7 @@ AES_FUNC_START2 (AesCtr_Code_HW)
     MM_OP_m (_mm_aesenclast_si128, w[1])
     MM_XOR (*data, m)
   }
-  
+
   p[-2] = ctr;
 }
 
@@ -369,15 +369,15 @@ required that <immintrin.h> must be included before <avxintrin.h>.
 
 #include <immintrin.h>
 #if defined(__clang__) && defined(_MSC_VER)
-  #if !defined(__AVX__)
-    #include <avxintrin.h>
-  #endif
-  #if !defined(__AVX2__)
-    #include <avx2intrin.h>
-  #endif
-  #if !defined(__VAES__)
-    #include <vaesintrin.h>
-  #endif
+#if !defined(__AVX__)
+#include <avxintrin.h>
+#endif
+#if !defined(__AVX2__)
+#include <avx2intrin.h>
+#endif
+#if !defined(__VAES__)
+#include <vaesintrin.h>
+#endif
 #endif  // __clang__ && _MSC_VER
 
 
@@ -556,51 +556,69 @@ VAES_COMPAT_STUB (AesCtr_Code_HW)
 
 #elif defined(MY_CPU_ARM_OR_ARM64) && defined(MY_CPU_LE)
 
-  #if defined(__clang__)
-    #if (__clang_major__ >= 8) // fix that check
-      #define USE_HW_AES
-    #endif
-  #elif defined(__GNUC__)
-    #if (__GNUC__ >= 6) // fix that check
-      #define USE_HW_AES
-    #endif
-  #elif defined(_MSC_VER)
-    #if _MSC_VER >= 1910
-      #define USE_HW_AES
-    #endif
-  #endif
+#if defined(__clang__)
+#if (__clang_major__ >= 8) // fix that check
+#define USE_HW_AES
+#endif
+#elif defined(__GNUC__)
+#if (__GNUC__ >= 6) // fix that check
+#define USE_HW_AES
+#endif
+#elif defined(_MSC_VER)
+#if _MSC_VER >= 1910
+#define USE_HW_AES
+#endif
+#endif
 
 #ifdef USE_HW_AES
 
 // #pragma message("=== AES HW === ")
 
 #if defined(__clang__) || defined(__GNUC__)
-  #ifdef MY_CPU_ARM64
-    #define ATTRIB_AES __attribute__((__target__("+crypto")))
-  #else
-    #define ATTRIB_AES __attribute__((__target__("fpu=crypto-neon-fp-armv8")))
-  #endif
+#ifdef MY_CPU_ARM64
+#define ATTRIB_AES __attribute__((__target__("+crypto")))
 #else
-  // _MSC_VER
-  // for arm32
-  #define _ARM_USE_NEW_NEON_INTRINSICS
+#define ATTRIB_AES __attribute__((__target__("fpu=crypto-neon-fp-armv8")))
+#endif
+#else
+// _MSC_VER
+// for arm32
+#define _ARM_USE_NEW_NEON_INTRINSICS
 #endif
 
 #ifndef ATTRIB_AES
-  #define ATTRIB_AES
+#define ATTRIB_AES
 #endif
 
 #if defined(_MSC_VER) && defined(MY_CPU_ARM64)
 #include <arm64_neon.h>
 #else
+#define __ARM_FEATURE_AES
 #include <arm_neon.h>
+
+static uint8x16_t vaeseq_u8_a(uint8x16_t __p0, uint8x16_t __p1) {
+    return vaeseq_u8(__p0,__p1);
+}
+
+static uint8x16_t vaesmcq_u8_a(uint8x16_t __p0) {
+    return vabdq_u8(__p0,__p0);
+}
+
+static uint8x16_t vaesdq_u8_a(uint8x16_t __p0, uint8x16_t __p1) {
+    return vabdq_u8(__p0,__p1);
+}
+
+static uint8x16_t vaesimcq_u8_a(uint8x16_t __p0) {
+    return vabdq_u8(__p0,__p0);
+}
+
 #endif
 
 typedef uint8x16_t v128;
 
 #define AES_FUNC_START(name) \
     void Z7_FASTCALL name(UInt32 *ivAes, Byte *data8, size_t numBlocks)
-    // void Z7_FASTCALL name(v128 *p, v128 *data, size_t numBlocks)
+// void Z7_FASTCALL name(v128 *p, v128 *data, size_t numBlocks)
 
 #define AES_FUNC_START2(name) \
 AES_FUNC_START (name); \
@@ -611,59 +629,54 @@ AES_FUNC_START (name)
 #define MM_OP_m(op, src)      MM_OP(op, m, src)
 #define MM_OP1_m(op)          m = op(m);
 
-#define MM_XOR( dest, src)    MM_OP(veorq_u8, dest, src)
-#define MM_XOR_m( src)        MM_XOR(m, src)
+#define MM_XOR(dest, src)    MM_OP(veorq_u8, dest, src)
+#define MM_XOR_m(src)        MM_XOR(m, src)
 
-#define AES_E_m(k)     MM_OP_m (vaeseq_u8, k)
-#define AES_E_MC_m(k)  AES_E_m (k)  MM_OP1_m(vaesmcq_u8)
+#define AES_E_m(k)     MM_OP_m (vaeseq_u8_a, k)
+#define AES_E_MC_m(k)  AES_E_m (k)  MM_OP1_m(vaesmcq_u8_a)
 
-
-AES_FUNC_START2 (AesCbc_Encode_HW)
-{
-  v128 *p = (v128*)(void*)ivAes;
-  v128 *data = (v128*)(void*)data8;
-  v128 m = *p;
-  const v128 k0 = p[2];
-  const v128 k1 = p[3];
-  const v128 k2 = p[4];
-  const v128 k3 = p[5];
-  const v128 k4 = p[6];
-  const v128 k5 = p[7];
-  const v128 k6 = p[8];
-  const v128 k7 = p[9];
-  const v128 k8 = p[10];
-  const v128 k9 = p[11];
-  const UInt32 numRounds2 = *(const UInt32 *)(p + 1);
-  const v128 *w = p + ((size_t)numRounds2 * 2);
-  const v128 k_z1 = w[1];
-  const v128 k_z0 = w[2];
-  for (; numBlocks != 0; numBlocks--, data++)
-  {
-    MM_XOR_m (*data);
-    AES_E_MC_m (k0)
-    AES_E_MC_m (k1)
-    AES_E_MC_m (k2)
-    AES_E_MC_m (k3)
-    AES_E_MC_m (k4)
-    AES_E_MC_m (k5)
-    AES_E_MC_m (k6)
-    AES_E_MC_m (k7)
-    AES_E_MC_m (k8)
-    if (numRounds2 >= 6)
-    {
-      AES_E_MC_m (k9)
-      AES_E_MC_m (p[12])
-      if (numRounds2 != 6)
-      {
-        AES_E_MC_m (p[13])
-        AES_E_MC_m (p[14])
-      }
+AES_FUNC_START2 (AesCbc_Encode_HW) {
+    v128 *p = (v128 *) (void *) ivAes;
+    v128 *data = (v128 *) (void *) data8;
+    v128 m = *p;
+    const v128 k0 = p[2];
+    const v128 k1 = p[3];
+    const v128 k2 = p[4];
+    const v128 k3 = p[5];
+    const v128 k4 = p[6];
+    const v128 k5 = p[7];
+    const v128 k6 = p[8];
+    const v128 k7 = p[9];
+    const v128 k8 = p[10];
+    const v128 k9 = p[11];
+    const UInt32 numRounds2 = *(const UInt32 *) (p + 1);
+    const v128 *w = p + ((size_t) numRounds2 * 2);
+    const v128 k_z1 = w[1];
+    const v128 k_z0 = w[2];
+    for (; numBlocks != 0; numBlocks--, data++) {
+        MM_XOR_m (*data)
+        AES_E_MC_m (k0)
+        AES_E_MC_m (k1)
+        AES_E_MC_m (k2)
+        AES_E_MC_m (k3)
+        AES_E_MC_m (k4)
+        AES_E_MC_m (k5)
+        AES_E_MC_m (k6)
+        AES_E_MC_m (k7)
+        AES_E_MC_m (k8)
+        if (numRounds2 >= 6) {
+            AES_E_MC_m (k9)
+            AES_E_MC_m (p[12])
+            if (numRounds2 != 6) {
+                AES_E_MC_m (p[13])
+                AES_E_MC_m (p[14])
+            }
+        }
+        AES_E_m  (k_z1)
+        MM_XOR_m (k_z0)
+        *data = m;
     }
-    AES_E_m  (k_z1)
-    MM_XOR_m (k_z0);
-    *data = m;
-  }
-  *p = m;
+    *p = m;
 }
 
 
@@ -676,32 +689,32 @@ AES_FUNC_START2 (AesCbc_Encode_HW)
 #define WOP_7(op)   WOP_6 (op)  op (m6, 6)
 #define WOP_8(op)   WOP_7 (op)  op (m7, 7)
 
-  #define NUM_WAYS      8
-  #define WOP_M1    WOP_8
+#define NUM_WAYS      8
+#define WOP_M1    WOP_8
 
 #define WOP(op)  op (m0, 0)   WOP_M1(op)
 
 #define DECLARE_VAR(reg, ii)  v128 reg;
-#define LOAD_data(  reg, ii)  reg = data[ii];
-#define STORE_data( reg, ii)  data[ii] = reg;
+#define LOAD_data(reg, ii)  reg = data[ii];
+#define STORE_data(reg, ii)  data[ii] = reg;
 #if (NUM_WAYS > 1)
 #define XOR_data_M1(reg, ii)  MM_XOR (reg, data[ii- 1])
 #endif
 
 #define MM_OP_key(op, reg)  MM_OP (op, reg, key)
 
-#define AES_D_m(k)      MM_OP_m (vaesdq_u8, k)
-#define AES_D_IMC_m(k)  AES_D_m (k)  MM_OP1_m (vaesimcq_u8)
+#define AES_D_m(k)      MM_OP_m (vaesdq_u8_a, k)
+#define AES_D_IMC_m(k)  AES_D_m (k)  MM_OP1_m (vaesimcq_u8_a)
 
-#define AES_XOR(   reg, ii)  MM_OP_key (veorq_u8,  reg)
-#define AES_D(     reg, ii)  MM_OP_key (vaesdq_u8, reg)
-#define AES_E(     reg, ii)  MM_OP_key (vaeseq_u8, reg)
+#define AES_XOR(reg, ii)  MM_OP_key (veorq_u8,  reg)
+#define AES_D(reg, ii)  MM_OP_key (vaesdq_u8_a, reg)
+#define AES_E(reg, ii)  MM_OP_key (vaeseq_u8_a, reg)
 
-#define AES_D_IMC( reg, ii)  AES_D (reg, ii)  reg = vaesimcq_u8(reg);
-#define AES_E_MC(  reg, ii)  AES_E (reg, ii)  reg = vaesmcq_u8(reg);
+#define AES_D_IMC(reg, ii)  AES_D (reg, ii)  reg = vaesimcq_u8_a(reg);
+#define AES_E_MC(reg, ii)  AES_E (reg, ii)  reg = vaesmcq_u8_a(reg);
 
 #define CTR_START(reg, ii)  MM_OP (vaddq_u64, ctr, one)  reg = vreinterpretq_u8_u64(ctr);
-#define CTR_END(  reg, ii)  MM_XOR (data[ii], reg)
+#define CTR_END(reg, ii)  MM_XOR (data[ii], reg)
 
 #define WOP_KEY(op, n) { \
     const v128 key = w[n]; \
@@ -720,110 +733,97 @@ AES_FUNC_START2 (AesCbc_Encode_HW)
 #define SINGLE_LOOP  \
     for (; data < dataEnd; data++)
 
+AES_FUNC_START2 (AesCbc_Decode_HW) {
+    v128 *p = (v128 *) (void *) ivAes;
+    v128 *data = (v128 *) (void *) data8;
+    v128 iv = *p;
+    const v128 *wStart = p + ((size_t) *(const UInt32 *) (p + 1)) * 2;
+    const v128 *dataEnd;
+    p += 2;
 
-AES_FUNC_START2 (AesCbc_Decode_HW)
-{
-  v128 *p = (v128*)(void*)ivAes;
-  v128 *data = (v128*)(void*)data8;
-  v128 iv = *p;
-  const v128 *wStart = p + ((size_t)*(const UInt32 *)(p + 1)) * 2;
-  const v128 *dataEnd;
-  p += 2;
-  
-  WIDE_LOOP_START
-  {
-    const v128 *w = wStart;
-    WOP (DECLARE_VAR)
-    WOP (LOAD_data)
-    WOP_KEY (AES_D_IMC, 2)
-    do
-    {
-      WOP_KEY (AES_D_IMC, 1)
-      WOP_KEY (AES_D_IMC, 0)
-      w -= 2;
-    }
-    while (w != p);
-    WOP_KEY (AES_D,   1)
-    WOP_KEY (AES_XOR, 0)
-    MM_XOR (m0, iv);
-    WOP_M1 (XOR_data_M1)
-    iv = data[NUM_WAYS - 1];
-    WOP (STORE_data)
-  }
-  WIDE_LOOP_END
+    WIDE_LOOP_START
+            {
+                const v128 *w = wStart;
+                WOP (DECLARE_VAR)
+                WOP (LOAD_data)
+                WOP_KEY (AES_D_IMC, 2)
+                do {
+                    WOP_KEY (AES_D_IMC, 1)
+                    WOP_KEY (AES_D_IMC, 0)
+                    w -= 2;
+                } while (w != p);
+                WOP_KEY (AES_D, 1)
+                WOP_KEY (AES_XOR, 0)
+                MM_XOR (m0, iv)
+                WOP_M1 (XOR_data_M1)
+                iv = data[NUM_WAYS - 1];
+                WOP (STORE_data)
+            }
+    WIDE_LOOP_END
 
-  SINGLE_LOOP
-  {
-    const v128 *w = wStart;
-    v128 m = *data;
-    AES_D_IMC_m (w[2])
-    do
-    {
-      AES_D_IMC_m (w[1]);
-      AES_D_IMC_m (w[0]);
-      w -= 2;
+    SINGLE_LOOP {
+        const v128 *w = wStart;
+        v128 m = *data;
+        AES_D_IMC_m (w[2])
+        do {
+            AES_D_IMC_m (w[1])
+            AES_D_IMC_m (w[0])
+            w -= 2;
+        } while (w != p);
+        AES_D_m  (w[1])
+        MM_XOR_m (w[0])
+        MM_XOR_m (iv)
+        iv = *data;
+        *data = m;
     }
-    while (w != p);
-    AES_D_m  (w[1]);
-    MM_XOR_m (w[0]);
-    MM_XOR_m (iv);
-    iv = *data;
-    *data = m;
-  }
-  
-  p[-2] = iv;
+
+    p[-2] = iv;
 }
 
 
-AES_FUNC_START2 (AesCtr_Code_HW)
-{
-  v128 *p = (v128*)(void*)ivAes;
-  v128 *data = (v128*)(void*)data8;
-  uint64x2_t ctr = vreinterpretq_u64_u8(*p);
-  const v128 *wEnd = p + ((size_t)*(const UInt32 *)(p + 1)) * 2;
-  const v128 *dataEnd;
-  uint64x2_t one = vdupq_n_u64(0);
-  one = vsetq_lane_u64(1, one, 0);
-  p += 2;
-  
-  WIDE_LOOP_START
-  {
-    const v128 *w = p;
-    WOP (DECLARE_VAR)
-    WOP (CTR_START)
-    do
-    {
-      WOP_KEY (AES_E_MC, 0)
-      WOP_KEY (AES_E_MC, 1)
-      w += 2;
-    }
-    while (w != wEnd);
-    WOP_KEY (AES_E_MC, 0)
-    WOP_KEY (AES_E,    1)
-    WOP_KEY (AES_XOR,  2)
-    WOP (CTR_END)
-  }
-  WIDE_LOOP_END
+AES_FUNC_START2 (AesCtr_Code_HW) {
+    v128 *p = (v128 *) (void *) ivAes;
+    v128 *data = (v128 *) (void *) data8;
+    uint64x2_t ctr = vreinterpretq_u64_u8(*p);
+    const v128 *wEnd = p + ((size_t) *(const UInt32 *) (p + 1)) * 2;
+    const v128 *dataEnd;
+    uint64x2_t one = vdupq_n_u64(0);
+    one = vsetq_lane_u64(1, one, 0);
+    p += 2;
 
-  SINGLE_LOOP
-  {
-    const v128 *w = p;
-    v128 m;
-    CTR_START (m, 0);
-    do
-    {
-      AES_E_MC_m (w[0]);
-      AES_E_MC_m (w[1]);
-      w += 2;
+    WIDE_LOOP_START
+            {
+                const v128 *w = p;
+                WOP (DECLARE_VAR)
+                WOP (CTR_START)
+                do {
+                    WOP_KEY (AES_E_MC, 0)
+                    WOP_KEY (AES_E_MC, 1)
+                    w += 2;
+                } while (w != wEnd);
+                WOP_KEY (AES_E_MC, 0)
+                WOP_KEY (AES_E, 1)
+                WOP_KEY (AES_XOR, 2)
+                WOP (CTR_END)
+            }
+    WIDE_LOOP_END
+
+    SINGLE_LOOP {
+        const v128 *w = p;
+        v128 m;
+        CTR_START (m, 0)
+        do {
+            AES_E_MC_m (w[0])
+            AES_E_MC_m (w[1])
+            w += 2;
+        } while (w != wEnd);
+        AES_E_MC_m (w[0])
+        AES_E_m    (w[1])
+        MM_XOR_m   (w[2])
+        CTR_END (m, 0)
     }
-    while (w != wEnd);
-    AES_E_MC_m (w[0])
-    AES_E_m    (w[1])
-    MM_XOR_m   (w[2])
-    CTR_END (m, 0)
-  }
-  
-  p[-2] = vreinterpretq_u8_u64(ctr);
+
+    p[-2] = vreinterpretq_u8_u64(ctr);
 }
 
 #endif // USE_HW_AES

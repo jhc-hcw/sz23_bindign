@@ -270,66 +270,66 @@ ATTRIB_SHA
 #endif
 void Z7_FASTCALL Sha1_UpdateBlocks_HW(UInt32 state[8], const Byte *data, size_t numBlocks)
 {
-  v128 abcd;
-  v128 c0, c1, c2, c3;
-  uint32_t e0;
-
-  if (numBlocks == 0)
-    return;
-
-  c0 = vdupq_n_u32(0x5a827999);
-  c1 = vdupq_n_u32(0x6ed9eba1);
-  c2 = vdupq_n_u32(0x8f1bbcdc);
-  c3 = vdupq_n_u32(0xca62c1d6);
-
-  abcd = LOAD_128(&state[0]);
-  e0 = state[4];
-  
-  do
-  {
-    v128 abcd_save;
-    v128 m0, m1, m2, m3;
-    v128 t;
-    uint32_t e0_save, e1;
-
-    abcd_save = abcd;
-    e0_save = e0;
-    
-    LOAD_SHUFFLE (m0, 0)
-    LOAD_SHUFFLE (m1, 1)
-    LOAD_SHUFFLE (m2, 2)
-    LOAD_SHUFFLE (m3, 3)
-                     
-    T(m0, c0);                                  H(e1); C(e0);
-    T(m1, c0);  SU0(m0, m1, m2);                H(e0); C(e1);
-    T(m2, c0);  SU0(m1, m2, m3);  SU1(m0, m3);  H(e1); C(e0);
-    T(m3, c0);  SU0(m2, m3, m0);  SU1(m1, m0);  H(e0); C(e1);
-    T(m0, c0);  SU0(m3, m0, m1);  SU1(m2, m1);  H(e1); C(e0);
-    T(m1, c1);  SU0(m0, m1, m2);  SU1(m3, m2);  H(e0); P(e1);
-    T(m2, c1);  SU0(m1, m2, m3);  SU1(m0, m3);  H(e1); P(e0);
-    T(m3, c1);  SU0(m2, m3, m0);  SU1(m1, m0);  H(e0); P(e1);
-    T(m0, c1);  SU0(m3, m0, m1);  SU1(m2, m1);  H(e1); P(e0);
-    T(m1, c1);  SU0(m0, m1, m2);  SU1(m3, m2);  H(e0); P(e1);
-    T(m2, c2);  SU0(m1, m2, m3);  SU1(m0, m3);  H(e1); M(e0);
-    T(m3, c2);  SU0(m2, m3, m0);  SU1(m1, m0);  H(e0); M(e1);
-    T(m0, c2);  SU0(m3, m0, m1);  SU1(m2, m1);  H(e1); M(e0);
-    T(m1, c2);  SU0(m0, m1, m2);  SU1(m3, m2);  H(e0); M(e1);
-    T(m2, c2);  SU0(m1, m2, m3);  SU1(m0, m3);  H(e1); M(e0);
-    T(m3, c3);  SU0(m2, m3, m0);  SU1(m1, m0);  H(e0); P(e1);
-    T(m0, c3);  SU0(m3, m0, m1);  SU1(m2, m1);  H(e1); P(e0);
-    T(m1, c3);                    SU1(m3, m2);  H(e0); P(e1);
-    T(m2, c3);                                  H(e1); P(e0);
-    T(m3, c3);                                  H(e0); P(e1);
-                                                                                                                     
-    abcd = vaddq_u32(abcd, abcd_save);
-    e0 += e0_save;
-    
-    data += 64;
-  }
-  while (--numBlocks);
-
-  STORE_128(&state[0], abcd);
-  state[4] = e0;
+//  v128 abcd;
+//  v128 c0, c1, c2, c3;
+//  uint32_t e0;
+//
+//  if (numBlocks == 0)
+//    return;
+//
+//  c0 = vdupq_n_u32(0x5a827999);
+//  c1 = vdupq_n_u32(0x6ed9eba1);
+//  c2 = vdupq_n_u32(0x8f1bbcdc);
+//  c3 = vdupq_n_u32(0xca62c1d6);
+//
+//  abcd = LOAD_128(&state[0]);
+//  e0 = state[4];
+//
+//  do
+//  {
+//    v128 abcd_save;
+//    v128 m0, m1, m2, m3;
+//    v128 t;
+//    uint32_t e0_save, e1;
+//
+//    abcd_save = abcd;
+//    e0_save = e0;
+//
+//    LOAD_SHUFFLE (m0, 0)
+//    LOAD_SHUFFLE (m1, 1)
+//    LOAD_SHUFFLE (m2, 2)
+//    LOAD_SHUFFLE (m3, 3)
+//
+//    T(m0, c0);                                  H(e1); C(e0);
+//    T(m1, c0);  SU0(m0, m1, m2);                H(e0); C(e1);
+//    T(m2, c0);  SU0(m1, m2, m3);  SU1(m0, m3);  H(e1); C(e0);
+//    T(m3, c0);  SU0(m2, m3, m0);  SU1(m1, m0);  H(e0); C(e1);
+//    T(m0, c0);  SU0(m3, m0, m1);  SU1(m2, m1);  H(e1); C(e0);
+//    T(m1, c1);  SU0(m0, m1, m2);  SU1(m3, m2);  H(e0); P(e1);
+//    T(m2, c1);  SU0(m1, m2, m3);  SU1(m0, m3);  H(e1); P(e0);
+//    T(m3, c1);  SU0(m2, m3, m0);  SU1(m1, m0);  H(e0); P(e1);
+//    T(m0, c1);  SU0(m3, m0, m1);  SU1(m2, m1);  H(e1); P(e0);
+//    T(m1, c1);  SU0(m0, m1, m2);  SU1(m3, m2);  H(e0); P(e1);
+//    T(m2, c2);  SU0(m1, m2, m3);  SU1(m0, m3);  H(e1); M(e0);
+//    T(m3, c2);  SU0(m2, m3, m0);  SU1(m1, m0);  H(e0); M(e1);
+//    T(m0, c2);  SU0(m3, m0, m1);  SU1(m2, m1);  H(e1); M(e0);
+//    T(m1, c2);  SU0(m0, m1, m2);  SU1(m3, m2);  H(e0); M(e1);
+//    T(m2, c2);  SU0(m1, m2, m3);  SU1(m0, m3);  H(e1); M(e0);
+//    T(m3, c3);  SU0(m2, m3, m0);  SU1(m1, m0);  H(e0); P(e1);
+//    T(m0, c3);  SU0(m3, m0, m1);  SU1(m2, m1);  H(e1); P(e0);
+//    T(m1, c3);                    SU1(m3, m2);  H(e0); P(e1);
+//    T(m2, c3);                                  H(e1); P(e0);
+//    T(m3, c3);                                  H(e0); P(e1);
+//
+//    abcd = vaddq_u32(abcd, abcd_save);
+//    e0 += e0_save;
+//
+//    data += 64;
+//  }
+//  while (--numBlocks);
+//
+//  STORE_128(&state[0], abcd);
+//  state[4] = e0;
 }
 
 #endif // USE_HW_SHA
@@ -345,7 +345,7 @@ void Z7_FASTCALL Sha1_UpdateBlocks_HW(UInt32 state[8], const Byte *data, size_t 
 // #include "Sha1.h"
 void Z7_FASTCALL Sha1_UpdateBlocks(UInt32 state[5], const Byte *data, size_t numBlocks);
 
-#pragma message("Sha1   HW-SW stub was used")
+//#pragma message("Sha1   HW-SW stub was used")
 
 void Z7_FASTCALL Sha1_UpdateBlocks_HW(UInt32 state[5], const Byte *data, size_t numBlocks);
 void Z7_FASTCALL Sha1_UpdateBlocks_HW(UInt32 state[5], const Byte *data, size_t numBlocks)
