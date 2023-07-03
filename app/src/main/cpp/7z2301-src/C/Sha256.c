@@ -47,7 +47,9 @@ This code is based on public domain code from Wei Dai's Crypto++ library. */
     #endif
   #endif
 #endif
-
+#ifndef NDK_SUPPORT_OPT
+#undef Z7_COMPILER_SHA256_SUPPORTED
+#endif
 void Z7_FASTCALL Sha256_UpdateBlocks(UInt32 state[8], const Byte *data, size_t numBlocks);
 
 #ifdef Z7_COMPILER_SHA256_SUPPORTED

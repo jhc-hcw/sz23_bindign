@@ -316,10 +316,10 @@ void Z7_FASTCALL Sha256_UpdateBlocks_HW(UInt32 state[8], const Byte *data, size_
     LOAD_SHUFFLE (m2, 2)
     LOAD_SHUFFLE (m3, 3)
 
-    R16 ( 0, NNN, NNN, SM1, NNN, SM1, SM2, SM1, SM2 );
-    R16 ( 1, SM1, SM2, SM1, SM2, SM1, SM2, SM1, SM2 );
-    R16 ( 2, SM1, SM2, SM1, SM2, SM1, SM2, SM1, SM2 );
-    R16 ( 3, SM1, SM2, NNN, SM2, NNN, NNN, NNN, NNN );
+    R16 ( 0, NNN, NNN, SM1, NNN, SM1, SM2, SM1, SM2 )
+    R16 ( 1, SM1, SM2, SM1, SM2, SM1, SM2, SM1, SM2 )
+    R16 ( 2, SM1, SM2, SM1, SM2, SM1, SM2, SM1, SM2 )
+    R16 ( 3, SM1, SM2, NNN, SM2, NNN, NNN, NNN, NNN )
 
     state0 = vaddq_u32(state0, state0_save);
     state1 = vaddq_u32(state1, state1_save);

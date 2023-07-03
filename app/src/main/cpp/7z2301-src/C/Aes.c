@@ -70,7 +70,9 @@ static Byte InvS[256];
     #endif
   #endif
 #endif
+#ifndef NDK_SUPPORT_OPT
 #undef USE_HW_AES
+#endif
 #ifdef USE_HW_AES
 #ifdef Z7_SHOW_AES_STATUS
 #include <stdio.h>

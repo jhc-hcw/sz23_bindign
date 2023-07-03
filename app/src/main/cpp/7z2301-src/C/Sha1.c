@@ -48,6 +48,9 @@ This code is based on public domain code of Steve Reid from Wei Dai's Crypto++ l
   #endif
 #endif
 
+#ifndef NDK_SUPPORT_OPT
+#undef Z7_COMPILER_SHA1_SUPPORTED
+#endif
 void Z7_FASTCALL Sha1_UpdateBlocks(UInt32 state[5], const Byte *data, size_t numBlocks);
 
 #ifdef Z7_COMPILER_SHA1_SUPPORTED

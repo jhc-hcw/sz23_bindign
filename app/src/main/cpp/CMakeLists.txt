@@ -10,6 +10,9 @@ set(SEVEN_ZIP_SRC ${ROOT}/7z2301-src)
 
 set(7Z_DIR ${CMAKE_SOURCE_DIR}/7z2301-src)
 
+set(NDK_SUPPORT_OPT "0")
+
+
 set(MT_SRC
         ${7Z_DIR}/C/LzFind.c
         ${7Z_DIR}/C/LzFindOpt.c
@@ -325,13 +328,21 @@ set(C_SRC
         ${7Z_DIR}/C/7zCrc.c
         ${7Z_DIR}/C/7zCrcOpt.c
         ${7Z_DIR}/C/Aes.c
-        #${7Z_DIR}/C/AesOpt.c
         ${7Z_DIR}/C/Sha256.c
-        ${7Z_DIR}/C/Sha256Opt.c
         ${7Z_DIR}/C/Sha1.c
-        ${7Z_DIR}/C/Sha1Opt.c
         ${7Z_DIR}/C/SwapBytes.c
+        #${7Z_DIR}/C/AesOpt.c
+        #${7Z_DIR}/C/Sha256Opt.c
+        # ${7Z_DIR}/C/Sha1Opt.c
         )
+if (NDK_SUPPORT_OPT STREQUAL "1")
+    set(C_SRC
+            ${C_SRC}
+            ${7Z_DIR}/C/AesOpt.c
+            ${7Z_DIR}/C/Sha256Opt.c
+            ${7Z_DIR}/C/Sha1Opt.c
+            )
+endif ()
 
 set(UI_COMMON_SRC
         ${7Z_DIR}/CPP/7zip/UI/Common/ArchiveCommandLine.cpp
@@ -394,18 +405,25 @@ set(7Z_COMMON_SRC_2
 set(COD_OPT
         ${7Z_DIR}/C/7zCrcOpt.c
         ${7Z_DIR}/C/XzCrc64Opt.c
-        ${7Z_DIR}/C/Sha1Opt.c
-        ${7Z_DIR}/C/Sha256Opt.c
-        #${7Z_DIR}/C/AesOpt.c
         ${7Z_DIR}/C/LzFindOpt.c
         ${7Z_DIR}/C/LzmaDec.c
+        # ${7Z_DIR}/C/Sha1Opt.c
+        # ${7Z_DIR}/C/Sha256Opt.c
+        #${7Z_DIR}/C/AesOpt.c
         )
+if (NDK_SUPPORT_OPT STREQUAL "1")
+    set(COD_OPT
+            ${COD_OPT}
+            ${7Z_DIR}/C/Sha1Opt.c
+            ${7Z_DIR}/C/Sha256Opt.c
+            ${7Z_DIR}/C/AesOpt.c
+            )
+endif ()
 
 set(ASM_SRC
         ${7Z_DIR}/Asm/arm64/LzmaDecOpt.S
         ${7Z_DIR}/Asm/arm64/7zAsm.S
         )
-
 
 
 include_directories(C)
@@ -457,6 +475,11 @@ include_directories(${7Z_DIR}/CPP/Windows)
 include_directories(${7Z_DIR}/CPP/Windows/Control)
 
 
+if (NDK_SUPPORT_OPT STREQUAL "1")
+    add_definitions(
+            -DNDK_SUPPORT_OPT
+    )
+endif ()
 
 add_definitions(
         -fmessage-length=0
@@ -524,7 +547,7 @@ add_library( # Sets the name of the library.
         SHARED
 
         # Provides a relative path to your source file(s).
-#        native-lib.cpp
+        #        native-lib.cpp
         ${COMMON_SRC}
         ${WIN_SRC}
         ${7ZIP_COMMON_SRC}
