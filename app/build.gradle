@@ -7,11 +7,11 @@ android {
 //    ndkVersion "25.1.8937393"
     ndkVersion "16.1.4479499"
 
-    namespace 'jhc.pic.sz23binding'
+    namespace 'com.xz.szbinding'
     compileSdk 33
 
     defaultConfig {
-        applicationId "jhc.pic.sz23binding"
+        applicationId "com.xz.szbinding"
         minSdk 26
         targetSdk 33
         versionCode 1

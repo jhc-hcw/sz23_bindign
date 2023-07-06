@@ -1,4 +1,4 @@
-package jhc.pic.sz23binding
+package com.xz.szbinding
 
 import android.content.Intent
 import android.net.Uri
@@ -8,10 +8,7 @@ import android.os.Environment
 import android.provider.Settings
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import jhc.pic.sz23binding.databinding.ActivityMainBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import com.xz.szbinding.databinding.ActivityMainBinding
 import kotlin.concurrent.thread
 
 
@@ -44,7 +41,7 @@ class MainActivity : AppCompatActivity() {
 //                    "wz.zip",
                     "/storage/emulated/0/wz.apk"
                 ))
-                Log.d("jhc","-------ed-------");
+                Log.d("com","-------ed-------");
             }
 
         }
@@ -63,7 +60,7 @@ class MainActivity : AppCompatActivity() {
     companion object {
         // Used to load the 'sz23binding' library on application startup.
         init {
-            System.loadLibrary("sz23binding")
+            System.loadLibrary("szbinding")
         }
     }
 }

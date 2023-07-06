@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.22.1)
 
 # Declares and names the project.
 
-project("sz23binding")
-set(TARGET sz23binding)
+project("szbinding")
+set(TARGET szbinding)
 set(CMAKE_CXX_STANDARD 11)
 set(ROOT src/main/cpp)
 set(SEVEN_ZIP_SRC ${ROOT}/7z2301-src)
@@ -549,7 +549,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fmessage-length=0 -Wno-narrowing")
 # Gradle automatically packages shared libraries with your APK.
 
 add_library( # Sets the name of the library.
-        sz23binding
+        szbinding
 
         # Sets the library as a shared library.
         SHARED
@@ -589,14 +589,13 @@ add_library( # Sets the name of the library.
 # you want to add. CMake verifies that the library exists before
 # completing its build.
 
-set_target_properties(sz23binding
+set_target_properties(szbinding
         PROPERTIES
         LINK_FLAGS
         #"-Wl,-z,defs -Wl,--no-undefined -DNDEBUG -lpthread -ldl"
         "-DNDEBUG -ldl"
         )
 
-#set_target_properties(sz23binding PROPERTIES COMPILE_FLAGS -mfpu=neon)
 find_library( # Sets the name of the path variable.
         log-lib
 
@@ -609,7 +608,7 @@ find_library( # Sets the name of the path variable.
 # build script, prebuilt third-party libraries, or system libraries.
 
 target_link_libraries( # Specifies the target library.
-        sz23binding
+        szbinding
 
         # Links the target library to the log library
         # included in the NDK.

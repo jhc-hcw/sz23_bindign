@@ -1,4 +1,4 @@
-package jhc.pic.sz23binding
+package com.xz.szbinding
 
 import org.junit.Test
 

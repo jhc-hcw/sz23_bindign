@@ -1,4 +1,4 @@
-package jhc.pic.sz23binding
+package com.xz.szbinding
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("jhc.pic.sz23binding", appContext.packageName)
+        assertEquals("com.xz.szbinding", appContext.packageName)
     }
 }

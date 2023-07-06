@@ -345,13 +345,13 @@ int main2(int numArgs, char *args[]);
 
 extern "C"
 JNIEXPORT jint JNICALL
-Java_jhc_pic_sz23binding_MainActivity_compress2(JNIEnv *env, jobject thiz, jobjectArray args);
+Java_com_xz_szbinding_MainActivity_compress2(JNIEnv *env, jobject thiz, jobjectArray args);
 
 #define jLogDD(s) __android_log_print(ANDROID_LOG_DEBUG, "jhc" , "%s",s)
 
 extern "C"
 JNIEXPORT jint JNICALL
-Java_jhc_pic_sz23binding_MainActivity_compress2(JNIEnv *env, jobject thiz, jobjectArray args) {
+Java_com_xz_szbinding_MainActivity_compress2(JNIEnv *env, jobject thiz, jobjectArray args) {
     int length = env->GetArrayLength(args);
     std::vector<std::shared_ptr<char *>> argsv;
 
