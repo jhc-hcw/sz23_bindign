@@ -7,70 +7,88 @@
 
 #include "MyString.h"
 #include "MyTypes.h"
+#include "Debug.h"
+#include <string>
+#include <sstream>
 
-class CStdOutStream
-{
-  FILE *_stream;
-  // bool _streamIsOpen;
+class CStdOutStream {
+    FILE *_stream;
+    std::stringstream buffer;
+    // bool _streamIsOpen;
 public:
-  bool IsTerminalMode;
-  int CodePage;
+    bool IsTerminalMode;
+    int CodePage;
 
-  CStdOutStream(FILE *stream = NULL):
-      _stream(stream),
-      // _streamIsOpen(false),
-      IsTerminalMode(false),
-      CodePage(-1)
-      {}
+    CStdOutStream(FILE *stream = NULL) :
+            _stream(stream),
+            // _streamIsOpen(false),
+            IsTerminalMode(false),
+            CodePage(-1) {}
 
-  // ~CStdOutStream() { Close(); }
+    // ~CStdOutStream() { Close(); }
 
-  // void AttachStdStream(FILE *stream) { _stream  = stream; _streamIsOpen = false; }
-  // bool IsDefined() const { return _stream  != NULL; }
+    // void AttachStdStream(FILE *stream) { _stream  = stream; _streamIsOpen = false; }
+    // bool IsDefined() const { return _stream  != NULL; }
 
-  operator FILE *() { return _stream; }
-  /*
-  bool Open(const char *fileName) throw();
-  bool Close() throw();
-  */
-  bool Flush() throw();
-  
-  CStdOutStream & operator<<(CStdOutStream & (* func)(CStdOutStream  &))
-  {
-    (*func)(*this);
-    return *this;
-  }
+    operator FILE *() { return _stream; }
 
-  CStdOutStream & operator<<(const char *s) throw()
-  {
-    fputs(s, _stream);
-    return *this;
-  }
+    /*
+    bool Open(const char *fileName) throw();
+    bool Close() throw();
+    */
+    bool Flush() throw();
 
-  CStdOutStream & operator<<(char c) throw()
-  {
-    fputc((unsigned char)c, _stream);
-    return *this;
-  }
+    CStdOutStream &operator<<(CStdOutStream &(*func)(CStdOutStream &)) {
+        (*func)(*this);
 
-  CStdOutStream & operator<<(Int32 number) throw();
-  CStdOutStream & operator<<(Int64 number) throw();
-  CStdOutStream & operator<<(UInt32 number) throw();
-  CStdOutStream & operator<<(UInt64 number) throw();
+        return *this;
+    }
 
-  CStdOutStream & operator<<(const wchar_t *s);
-  void PrintUString(const UString &s, AString &temp);
-  void Convert_UString_to_AString(const UString &src, AString &dest);
+    CStdOutStream &operator<<(const char *s) throw() {
+        fputs(s, _stream);
+        jLogStr(s);
+        buffer << s;
+        return *this;
+    }
 
-  void Normalize_UString_LF_Allowed(UString &s);
-  void Normalize_UString(UString &s);
+    CStdOutStream &operator<<(char c) throw() {
+        fputc((unsigned char) c, _stream);
+        jLogD("%c", c);
+        buffer << c;
+        //putc(c,_stream);
+        return *this;
+    }
 
-  void NormalizePrint_UString(const UString &s, UString &tempU, AString &tempA);
-  void NormalizePrint_UString(const UString &s);
-  void NormalizePrint_wstr(const wchar_t *s);
+    CStdOutStream &operator<<(Int32 number) throw();
+
+    CStdOutStream &operator<<(Int64 number) throw();
+
+    CStdOutStream &operator<<(UInt32 number) throw();
+
+    CStdOutStream &operator<<(UInt64 number) throw();
+
+    CStdOutStream &operator<<(const wchar_t *s);
+
+    void PrintUString(const UString &s, AString &temp);
+
+    void Convert_UString_to_AString(const UString &src, AString &dest);
+
+    void Normalize_UString_LF_Allowed(UString &s);
+
+    void Normalize_UString(UString &s);
+
+    void NormalizePrint_UString(const UString &s, UString &tempU, AString &tempA);
+
+    void NormalizePrint_UString(const UString &s);
+
+    void NormalizePrint_wstr(const wchar_t *s);
+
+    void printAll() {
+        jLogStr(buffer.str().c_str());
+    }
 };
 
-CStdOutStream & endl(CStdOutStream & outStream) throw();
+CStdOutStream &endl(CStdOutStream &outStream) throw();
 
 extern CStdOutStream g_StdOut;
 extern CStdOutStream g_StdErr;

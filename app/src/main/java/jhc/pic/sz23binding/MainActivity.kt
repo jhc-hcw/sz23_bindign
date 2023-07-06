@@ -1,9 +1,19 @@
 package jhc.pic.sz23binding
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import android.widget.TextView
+import android.os.Environment
+import android.provider.Settings
+import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import jhc.pic.sz23binding.databinding.ActivityMainBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlin.concurrent.thread
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -12,18 +22,43 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+            && !Environment.isExternalStorageManager()
+        ) {
+            val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+            val uri = Uri.fromParts("package", packageName, null)
+            intent.data = uri
+            startActivity(intent)
+        }
+
         binding = ActivityMainBinding.inflate(layoutInflater)
+
         setContentView(binding.root)
 
+        binding.sampleText.setOnClickListener {
+            thread {
+                compress2(arrayOf(
+                    "a",
+                    "tzip",
+                    "/storage/emulated/0/test4/wa.zip",
+//                    "wz.zip",
+                    "/storage/emulated/0/wz.apk"
+                ))
+                Log.d("jhc","-------ed-------");
+            }
+
+        }
         // Example of a call to a native method
-        binding.sampleText.text = stringFromJNI()
     }
 
     /**
      * A native method that is implemented by the 'sz23binding' native library,
      * which is packaged with this application.
      */
-    external fun stringFromJNI(): String
+    private external fun compress2(
+        args: Array<String>,
+    ): Int
+
 
     companion object {
         // Used to load the 'sz23binding' library on application startup.

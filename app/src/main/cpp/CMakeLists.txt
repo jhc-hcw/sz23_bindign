@@ -4,26 +4,19 @@ cmake_minimum_required(VERSION 3.22.1)
 
 project("sz23binding")
 set(TARGET sz23binding)
-
+set(CMAKE_CXX_STANDARD 11)
 set(ROOT src/main/cpp)
 set(SEVEN_ZIP_SRC ${ROOT}/7z2301-src)
 
 set(7Z_DIR ${CMAKE_SOURCE_DIR}/7z2301-src)
 
-set(NDK_SUPPORT_OPT "0")
+set(NDK_SUPPORT_OPT "1")
+set(MULTI_THREAD "1")
 
 
-set(MT_SRC
-        ${7Z_DIR}/C/LzFind.c
-        ${7Z_DIR}/C/LzFindOpt.c
-        ${7Z_DIR}/C/Threads.c
-        ${7Z_DIR}/CPP/7zip/Common/StreamBinder.cpp
-        ${7Z_DIR}/CPP/Windows/Synchronization.cpp
-        ${7Z_DIR}/CPP/7zip/Common/VirtThread.cpp
-        ${7Z_DIR}/CPP/7zip/Common/MemBlocks.cpp
-        ${7Z_DIR}/CPP/7zip/Common/OutMemStream.cpp
-        ${7Z_DIR}/CPP/7zip/Common/ProgressMt.cpp
+set(MY_SRC
         )
+
 
 set(COMMON_SRC
         ${7Z_DIR}/CPP/Common/CRC.cpp
@@ -47,6 +40,22 @@ set(COMMON_SRC
         ${7Z_DIR}/CPP/Common/XzCrc64Init.cpp
         ${7Z_DIR}/CPP/Common/XzCrc64Reg.cpp
         )
+
+if (MULTI_THREAD STREQUAL "1")
+    set(COMMON_SRC
+            ${COMMON_SRC}
+            ${7Z_DIR}/C/LzFind.c
+            ${7Z_DIR}/C/LzFindMt.c
+            ${7Z_DIR}/C/LzFindOpt.c
+            ${7Z_DIR}/C/Threads.c
+            ${7Z_DIR}/CPP/7zip/Common/StreamBinder.cpp
+            ${7Z_DIR}/CPP/Windows/Synchronization.cpp
+            ${7Z_DIR}/CPP/7zip/Common/VirtThread.cpp
+            ${7Z_DIR}/CPP/7zip/Common/MemBlocks.cpp
+            ${7Z_DIR}/CPP/7zip/Common/OutMemStream.cpp
+            ${7Z_DIR}/CPP/7zip/Common/ProgressMt.cpp
+            )
+endif ()
 
 set(WIN_SRC
         ${7Z_DIR}/CPP/Windows/FileDir.cpp
@@ -426,7 +435,8 @@ set(ASM_SRC
         )
 
 
-include_directories(C)
+include_directories(${7Z_DIR}/C)
+include_directories(${CMAKE_SOURCE_DIR}/java_binding)
 include_directories(${7Z_DIR}/C/Util/7z)
 include_directories(${7Z_DIR}/C/Util/7zipInstall)
 include_directories(${7Z_DIR}/C/Util/7zipUninstall)
@@ -481,11 +491,21 @@ if (NDK_SUPPORT_OPT STREQUAL "1")
     )
 endif ()
 
+if (MULTI_THREAD STREQUAL "0")
+    add_definitions(
+            -DZ7_ST
+    )
+endif ()
+
+if (CMAKE_BUILD_TYPE MATCHES Debug)## 处于Debug模式
+    add_definitions(
+            -DDEBUG_MODE)
+else ()
+    MESSAGE(" is not debug ")
+endif ()
+
 add_definitions(
         -fmessage-length=0
-        -DZ7_ST
-        #-D__ARM_ARCH=8
-        #-D__ARM_FEATURE_AES
         -O2
         -c
         -Werror
@@ -515,22 +535,10 @@ add_definitions(
         -Wno-zero-as-null-pointer-constant
         -Wno-conversion
         -fPIC
+        -Wno-gnu-zero-variadic-macro-arguments
+
 )
 
-#add_definitions(
-#        -DBREAK_HANDLER
-#        -DENV_HAVE_GCCVISIBILITYPATCH
-#        -DENV_UNIX
-#        -DUNICODE
-#        -DUNIX_USE_WIN_FILE
-#        -D_7_Zip_JBinding_EXPORTS
-#        -D_FILE_OFFSET_BITS=64
-#        -D_LARGEFILE_SOURCE
-#        -D_REENTRANT
-#        -D_UNICODE
-#        # -D_7ZIP_ST    #加这个避免线程错误,但开启会有编译错误
-#        #-DDEBUG_MODE
-#)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fmessage-length=0 -Wno-narrowing")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fmessage-length=0 -Wno-narrowing")
@@ -546,8 +554,6 @@ add_library( # Sets the name of the library.
         # Sets the library as a shared library.
         SHARED
 
-        # Provides a relative path to your source file(s).
-        #        native-lib.cpp
         ${COMMON_SRC}
         ${WIN_SRC}
         ${7ZIP_COMMON_SRC}
@@ -573,6 +579,8 @@ add_library( # Sets the name of the library.
         ${7Z_COMMON_SRC_2}
         ${COD_OPT}
         ${ASM_SRC}
+        # ${MY_SRC}
+        # native-lib.cpp
         )
 
 # Searches for a specified prebuilt library and stores the path as a
@@ -606,5 +614,4 @@ target_link_libraries( # Specifies the target library.
         # Links the target library to the log library
         # included in the NDK.
         ${log-lib}
-
         )
