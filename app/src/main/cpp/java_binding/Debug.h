@@ -15,3 +15,11 @@
 #define jLogStr(_str_)
 #endif
 #endif //SZ23BINDING_DEBUG_H
+
+
+#define MY_ASSERT(a) {}
+
+#   define TRACE(msg) {}
+#   define _TRACE(msg) {}
+
+#   define TRACE_OBJECT_CREATION(classname) {}

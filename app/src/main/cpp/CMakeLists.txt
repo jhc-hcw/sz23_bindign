@@ -9,6 +9,7 @@ set(ROOT src/main/cpp)
 set(SEVEN_ZIP_SRC ${ROOT}/7z2301-src)
 
 set(7Z_DIR ${CMAKE_SOURCE_DIR}/7z2301-src)
+set(JAVA_BINDING_DIR ${CMAKE_SOURCE_DIR}/java_binding)
 
 set(NDK_SUPPORT_OPT "1")
 set(MULTI_THREAD "1")
@@ -16,7 +17,12 @@ set(MULTI_THREAD "1")
 
 set(MY_SRC
         )
-
+set (JAVA_BINDING_SRC
+        ${JAVA_BINDING_DIR}/JavaStaticInfo.cpp
+        ${JAVA_BINDING_DIR}/SevenZipJBinding.cpp
+        ${JAVA_BINDING_DIR}/JBindingTools.cpp
+        ${JAVA_BINDING_DIR}/JNITools.cpp
+        )
 
 set(COMMON_SRC
         ${7Z_DIR}/CPP/Common/CRC.cpp
@@ -579,6 +585,7 @@ add_library( # Sets the name of the library.
         ${7Z_COMMON_SRC_2}
         ${COD_OPT}
         ${ASM_SRC}
+        ${JAVA_BINDING_SRC}
         # ${MY_SRC}
         # native-lib.cpp
         )
