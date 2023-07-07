@@ -1812,6 +1812,7 @@ HRESULT GetArchive(
     RINOK(extractCallback->BeforeOpen(arcPath, options.TestMode))
     CArchiveLink *archiveLinkPtr = new CArchiveLink;
     CArchiveLink &arcLink = *archiveLinkPtr;   //变为指针
+    aResult->arcLink = archiveLinkPtr;
 
     CObjectVector<COpenType> *types2 = new CObjectVector<COpenType>(types);
     /*
@@ -1842,8 +1843,9 @@ HRESULT GetArchive(
     #endif
     */
 
-    COpenOptions op;
-    aResult ->cOpenOptions = &op;
+    COpenOptions *opPtr = new COpenOptions;
+    COpenOptions &op=*opPtr;
+    aResult ->cOpenOptions = opPtr;
 #ifndef Z7_SFX
     op.props = &options.Properties;
 #endif
@@ -1974,30 +1976,30 @@ HRESULT GetArchive(
     false;
 #endif
 
-    RINOK(DecompressArchive(
-            codecs,
-            arcLink,
-            fi.Size + arcLink.VolumesSize,
-            wildcardCensor,
-            options,
-            calcCrc,
-            extractCallback, faeCallback, ecs,
-            errorMessage, packProcessed))
+//    RINOK(DecompressArchive(
+//            codecs,
+//            arcLink,
+//            fi.Size + arcLink.VolumesSize,
+//            wildcardCensor,
+//            options,
+//            calcCrc,
+//            extractCallback, faeCallback, ecs,
+//            errorMessage, packProcessed))
 
-    if (!options.StdInMode)
-      packProcessed = fi.Size + arcLink.VolumesSize;
-    totalPackProcessed += packProcessed;
-    ecs->LocalProgressSpec->InSize += packProcessed;
-    ecs->LocalProgressSpec->OutSize = ecs->UnpackSize;
+//    if (!options.StdInMode)
+//      packProcessed = fi.Size + arcLink.VolumesSize;
+//    totalPackProcessed += packProcessed;
+//    ecs->LocalProgressSpec->InSize += packProcessed;
+//    ecs->LocalProgressSpec->OutSize = ecs->UnpackSize;
     if (!errorMessage.IsEmpty())
       return E_FAIL;
   }
 
-  if (multi || thereAreNotOpenArcs)
-  {
-    RINOK(faeCallback->SetTotal(totalPackSize))
-    RINOK(faeCallback->SetCompleted(&totalPackProcessed))
-  }
+//  if (multi || thereAreNotOpenArcs)
+//  {
+//    RINOK(faeCallback->SetTotal(totalPackSize))
+//    RINOK(faeCallback->SetCompleted(&totalPackProcessed))
+//  }
 
   st.NumFolders = ecs->NumFolders;
   st.NumFiles = ecs->NumFiles;

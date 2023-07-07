@@ -349,6 +349,15 @@ Java_com_xz_szbinding_MainActivity_compress2(JNIEnv *env, jobject thiz, jobjectA
 
 #define jLogDD(s) __android_log_print(ANDROID_LOG_DEBUG, "jhc" , "%s",s)
 
+int Main3(
+        int numArgs, char *args[],AResult *aResult
+);
+
+int Z7_CDECL createArchive
+        (
+                int numArgs, char *args[],AResult *aResult
+        );
+
 extern "C"
 JNIEXPORT jint JNICALL
 Java_com_xz_szbinding_MainActivity_compress2(JNIEnv *env, jobject thiz, jobjectArray args) {
@@ -366,7 +375,7 @@ Java_com_xz_szbinding_MainActivity_compress2(JNIEnv *env, jobject thiz, jobjectA
     __android_log_print(ANDROID_LOG_DEBUG, "jhc", "%s", "in main2 ");
 
     char arg0[] = "7z";
-    char arg1[] = "l";
+    char arg1[] = "x";
     char arg2[] = "/storage/emulated/0/test5/mk.gz";
     char arg3[] = "-o/storage/emulated/0/test4";
     char arg4[] = "-p1234";
@@ -377,10 +386,127 @@ Java_com_xz_szbinding_MainActivity_compress2(JNIEnv *env, jobject thiz, jobjectA
     jLogDD(arg4);
     char *ar2[] = {arg0, arg1, arg2, arg3, arg4, arg5};
 
-    int res = main2(5, ar2);
+    AResult *aResult = new AResult;
+    int res = createArchive(5, ar2,aResult);
+    if(aResult->arcLink!= nullptr){
+        jLogStr("yes yes yes ");
+    } else{
+        jLogStr("nonono is empty");
+    }
+    delete aResult;
     __android_log_print(ANDROID_LOG_DEBUG, "jhc", "%d--%s", res, "已经退出");
     delete[] ar;
     //  _openCallback.release();
 //    _callback .release();
+    return res;
+}
+
+
+int Z7_CDECL createArchive
+        (
+        int numArgs, char *args[],AResult *aResult
+) {
+    g_ErrStream = &g_StdErr;
+    g_StdStream = &g_StdOut;
+
+    // #if (defined(_MSC_VER) && defined(_M_IX86))
+    if (!CheckIsa()) {
+        PrintError("ERROR: processor doesn't support required ISA extension");
+        return NExitCode::kFatalError;
+    }
+    // #endif
+
+    NT_CHECK
+
+    NConsoleClose::CCtrlHandlerSetter ctrlHandlerSetter;
+    int res = 0;
+
+    try {
+#ifdef _WIN32
+        My_SetDefaultDllDirectories();
+#endif
+
+        res = Main3(
+#ifndef _WIN32
+                numArgs, args,aResult
+#endif
+        );
+    }
+    catch (const CNewException &) {
+        PrintError(kMemoryExceptionMessage);
+        return (NExitCode::kMemoryError);
+    }
+    catch (const NConsoleClose::CCtrlBreakException &) {
+        PrintError(kUserBreakMessage);
+        return (NExitCode::kUserBreak);
+    }
+    catch (const CMessagePathException &e) {
+        PrintError(kException_CmdLine_Error_Message);
+        if (g_ErrStream)
+            *g_ErrStream << e << endl;
+        return (NExitCode::kUserError);
+    }
+    catch (const CSystemException &systemError) {
+        if (systemError.ErrorCode == E_OUTOFMEMORY) {
+            PrintError(kMemoryExceptionMessage);
+            return (NExitCode::kMemoryError);
+        }
+        if (systemError.ErrorCode == E_ABORT) {
+            PrintError(kUserBreakMessage);
+            return (NExitCode::kUserBreak);
+        }
+        if (g_ErrStream) {
+            PrintError("System ERROR:");
+            *g_ErrStream << NError::MyFormatMessage(systemError.ErrorCode) << endl;
+        }
+        return (NExitCode::kFatalError);
+    }
+    catch (NExitCode::EEnum exitCode) {
+        FlushStreams();
+        if (g_ErrStream)
+            *g_ErrStream << kInternalExceptionMessage << exitCode << endl;
+        return (exitCode);
+    }
+    catch (const UString &s) {
+        if (g_ErrStream) {
+            PrintError(kExceptionErrorMessage);
+            *g_ErrStream << s << endl;
+        }
+        return (NExitCode::kFatalError);
+    }
+    catch (const AString &s) {
+        if (g_ErrStream) {
+            PrintError(kExceptionErrorMessage);
+            *g_ErrStream << s << endl;
+        }
+        return (NExitCode::kFatalError);
+    }
+    catch (const char *s) {
+        if (g_ErrStream) {
+            PrintError(kExceptionErrorMessage);
+            *g_ErrStream << s << endl;
+        }
+        return (NExitCode::kFatalError);
+    }
+    catch (const wchar_t *s) {
+        if (g_ErrStream) {
+            PrintError(kExceptionErrorMessage);
+            *g_ErrStream << s << endl;
+        }
+        return (NExitCode::kFatalError);
+    }
+    catch (int t) {
+        if (g_ErrStream) {
+            FlushStreams();
+            *g_ErrStream << kInternalExceptionMessage << t << endl;
+            return (NExitCode::kFatalError);
+        }
+    }
+    catch (...) {
+        PrintError(kUnknownExceptionMessage);
+        return (NExitCode::kFatalError);
+    }
+    g_ErrStream->printAll();
+    g_StdStream->printAll();
     return res;
 }

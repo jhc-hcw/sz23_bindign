@@ -1571,10 +1571,10 @@ int Main2(
 //  解压 获取iarchive
 
 int Main3(
-        int numArgs, char *args[]
+        int numArgs, char *args[],AResult *aResult
 );
 int Main3(
-        int numArgs, char *args[]
+        int numArgs, char *args[],AResult *aResult
 )
 {
 #if defined(MY_CPU_SIZEOF_POINTER)
@@ -1920,7 +1920,6 @@ int Main3(
           // hb.Init();
         }
 
-        AResult *aResult = new AResult;
         aResult->pArchivePathsFullSorted = ArchivePathsFullSortedPtr;
         aResult->pArchivePathsSorted = ArchivePathsSortedPtr;
         aResult ->cExtractOptions = eoPtr;
@@ -1940,6 +1939,8 @@ int Main3(
                 hashCalc, errorMessage, stat, aResult);
 
         ecs->ClosePercents();
+
+        aResult->result = hresultMain;
 
         if (!errorMessage.IsEmpty())
         {
@@ -2051,7 +2052,7 @@ int Main3(
     );
 
   ThrowException_if_Error(hresultMain);
-
+  aResult->result = retCode;
   return retCode;
 }
 

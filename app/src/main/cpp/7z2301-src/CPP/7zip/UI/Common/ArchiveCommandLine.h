@@ -174,11 +174,14 @@ public:
     const char* message;
 
     ~AResult(){
+        jLogStr("delete Aresult---- ");
       delete excludedFormatsPtr;
-      //delete cal1;
-      //delete cal2;
+      delete cExtractOptions;
+      delete cArcCmdLineOptions;
+      delete cOpenOptions;
       CMyComPtr<IFolderArchiveExtractCallback> extractCallback = ecs;
       CMyComPtr<IArchiveExtractCallback> ec(cArchiveExtractCallback);
+      arcLink->Release();
       delete arcLink;
       delete pArchivePathsFullSorted;
       delete pArchivePathsSorted;
