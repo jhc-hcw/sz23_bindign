@@ -120,5 +120,17 @@ HRESULT DecompressArchive(
         UString &errorMessage,
         UInt64 &stdInProcessed);
 
+HRESULT DecompressArchiveWithIndices(
+        CCodecs *codecs,
+        const CArchiveLink &arcLink,
+        UInt64 packSize,
+        const CExtractOptions &options,
+        IExtractCallbackUI *callback,
+        IFolderArchiveExtractCallback *callbackFAE,
+        CArchiveExtractCallback *ecs,
+        UString &errorMessage,
+        UInt64 &stdInProcessed,
+        CRecordVector<UInt32> &realIndices);
+
 
 #endif

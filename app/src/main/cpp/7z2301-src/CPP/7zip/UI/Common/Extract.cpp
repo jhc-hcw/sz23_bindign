@@ -36,17 +36,18 @@ void SetErrorMessage(const char *message,
 
 
 HRESULT DecompressArchive(
-    CCodecs *codecs,
-    const CArchiveLink &arcLink,
-    UInt64 packSize,
-    const NWildcard::CCensorNode &wildcardCensor,
-    const CExtractOptions &options,
-    bool calcCrc,
-    IExtractCallbackUI *callback,
-    IFolderArchiveExtractCallback *callbackFAE,
-    CArchiveExtractCallback *ecs,
-    UString &errorMessage,
-    UInt64 &stdInProcessed)
+        CCodecs *codecs,
+        const CArchiveLink &arcLink,
+        UInt64 packSize,
+        const NWildcard::CCensorNode &wildcardCensor,
+        const CExtractOptions &options,
+        bool calcCrc,
+        IExtractCallbackUI *callback,
+        IFolderArchiveExtractCallback *callbackFAE,
+        CArchiveExtractCallback *ecs,
+        UString &errorMessage,
+        UInt64 &stdInProcessed
+        )
 {
   const CArc &arc = arcLink.Arcs.Back();
   stdInProcessed = 0;
@@ -229,6 +230,119 @@ HRESULT DecompressArchive(
   else
     result = archive->Extract(&realIndices.Front(), realIndices.Size(), testMode, ecs);
   
+  const HRESULT res2 = ecsCloser.Close();
+  if (result == S_OK)
+    result = res2;
+
+  return callback->ExtractResult(result);
+}
+
+HRESULT DecompressArchiveWithIndices(
+        CCodecs *codecs,
+        const CArchiveLink &arcLink,
+        UInt64 packSize,
+        const CExtractOptions &options,
+        IExtractCallbackUI *callback,
+        IFolderArchiveExtractCallback *callbackFAE,
+        CArchiveExtractCallback *ecs,
+        UString &errorMessage,
+        UInt64 &stdInProcessed,
+        CRecordVector<UInt32> &realIndices)
+{
+  const CArc &arc = arcLink.Arcs.Back();
+  IInArchive *archive = arc.Archive;
+
+  UStringVector removePathParts;
+
+  FString outDir = options.OutputDir;
+  UString replaceName = arc.DefaultName;
+
+  if (arcLink.Arcs.Size() > 1)
+  {
+    // Most "pe" archives have same name of archive subfile "[0]" or ".rsrc_1".
+    // So it extracts different archives to one folder.
+    // We will use top level archive name
+    const CArc &arc0 = arcLink.Arcs[0];
+    if (arc0.FormatIndex >= 0 && StringsAreEqualNoCase_Ascii(codecs->Formats[(unsigned)arc0.FormatIndex].Name, "pe"))
+      replaceName = arc0.DefaultName;
+  }
+
+  outDir.Replace(FString("*"), us2fs(Get_Correct_FsFile_Name(replaceName)));
+
+  bool elimIsPossible = false;
+  UString elimPrefix; // only pure name without dir delimiter
+  FString outDirReduced = outDir;
+
+  if (options.ElimDup.Val && options.PathMode != NExtract::NPathMode::kAbsPaths)
+  {
+    UString dirPrefix;
+    SplitPathToParts_Smart(fs2us(outDir), dirPrefix, elimPrefix);
+    if (!elimPrefix.IsEmpty())
+    {
+      if (IsPathSepar(elimPrefix.Back()))
+        elimPrefix.DeleteBack();
+      if (!elimPrefix.IsEmpty())
+      {
+        outDirReduced = us2fs(dirPrefix);
+        elimIsPossible = true;
+      }
+    }
+  }
+
+  if (elimIsPossible)
+  {
+    removePathParts.Add(elimPrefix);
+    // outDir = outDirReduced;
+  }
+
+#ifdef _WIN32
+  // GetCorrectFullFsPath doesn't like "..".
+  // outDir.TrimRight();
+  // outDir = GetCorrectFullFsPath(outDir);
+#endif
+
+  if (outDir.IsEmpty())
+    outDir = "." STRING_PATH_SEPARATOR;
+    /*
+    #ifdef _WIN32
+    else if (NName::IsAltPathPrefix(outDir)) {}
+    #endif
+    */
+  else if (!CreateComplexDir(outDir))
+  {
+    const HRESULT res = GetLastError_noZero_HRESULT();
+    SetErrorMessage("Cannot create output directory", outDir, res, errorMessage);
+    return res;
+  }
+
+  ecs->Init(
+          options.NtOptions,
+          nullptr,
+          &arc,
+          callbackFAE,
+          options.StdOutMode, options.TestMode,
+          outDir,
+          removePathParts, false,
+          packSize);
+
+
+#ifdef SUPPORT_LINKS
+
+  if (!options.StdInMode &&
+      !options.TestMode &&
+      options.NtOptions.HardLinks.Val)
+  {
+    RINOK(ecs->PrepareHardLinks(&realIndices))
+  }
+
+#endif
+
+
+  HRESULT result;
+  CArchiveExtractCallback_Closer ecsCloser(ecs);
+
+  result = archive->Extract(&realIndices.Front(), realIndices.Size(), false, ecs);
+
   const HRESULT res2 = ecsCloser.Close();
   if (result == S_OK)
     result = res2;

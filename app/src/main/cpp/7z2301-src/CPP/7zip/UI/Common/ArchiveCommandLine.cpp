@@ -1752,6 +1752,7 @@ HRESULT GetArchive(
     skipArcs[i] = false;
 
   CArchiveExtractCallback *ecs = new CArchiveExtractCallback;//两个回调
+  aResult -> cArchiveExtractCallback = ecs;
  // CMyComPtr<IArchiveExtractCallback> ec(ecs); //可以不要；
 
   const bool multi = (numArcs > 1);
@@ -1842,6 +1843,7 @@ HRESULT GetArchive(
     */
 
     COpenOptions op;
+    aResult ->cOpenOptions = &op;
 #ifndef Z7_SFX
     op.props = &options.Properties;
 #endif

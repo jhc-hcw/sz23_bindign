@@ -12,6 +12,7 @@
 #include "HashCalc.h"
 #include "Update.h"
 #include "Extract.h"
+#include "ExtractCallbackConsole.h"
 
 typedef CMessagePathException CArcCmdLineException;
 
@@ -158,23 +159,26 @@ public:
   void Parse2(CArcCmdLineOptions &options);
 };
 
-struct AResult{
+struct AResult {
 public:
     HRESULT result;
-    CArcCmdLineOptions * opt;
+    CExtractOptions * cExtractOptions;
+    CArcCmdLineOptions *cArcCmdLineOptions;
     COpenOptions *cOpenOptions;
     CIntVector *excludedFormatsPtr;
-    IExtractCallbackUI *cal2;
     CArchiveLink *arcLink;
     UStringVector *pArchivePathsFullSorted;
     UStringVector *pArchivePathsSorted;
+    CArchiveExtractCallback *cArchiveExtractCallback;
+    CExtractCallbackConsole *ecs ;
     const char* message;
 
     ~AResult(){
-      delete opt;
       delete excludedFormatsPtr;
       //delete cal1;
       //delete cal2;
+      CMyComPtr<IFolderArchiveExtractCallback> extractCallback = ecs;
+      CMyComPtr<IArchiveExtractCallback> ec(cArchiveExtractCallback);
       delete arcLink;
       delete pArchivePathsFullSorted;
       delete pArchivePathsSorted;

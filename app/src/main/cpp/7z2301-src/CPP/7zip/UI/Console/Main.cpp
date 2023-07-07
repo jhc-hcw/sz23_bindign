@@ -1869,7 +1869,7 @@ int Main3(
       if (isExtractGroupCommand)
       {
         CExtractCallbackConsole *ecs = new CExtractCallbackConsole;
-        CMyComPtr<IFolderArchiveExtractCallback> extractCallback = ecs;
+       // CMyComPtr<IFolderArchiveExtractCallback> extractCallback = ecs;
 
 #ifndef Z7_NO_CRYPTO
         ecs->PasswordIsDefined = options.PasswordEnabled;
@@ -1921,6 +1921,12 @@ int Main3(
         }
 
         AResult *aResult = new AResult;
+        aResult->pArchivePathsFullSorted = ArchivePathsFullSortedPtr;
+        aResult->pArchivePathsSorted = ArchivePathsSortedPtr;
+        aResult ->cExtractOptions = eoPtr;
+        aResult ->cArcCmdLineOptions = optionsPtr;
+        aResult ->excludedFormatsPtr = excludedFormatsPtr;
+        aResult ->ecs = ecs;
         hresultMain = GetArchive(
                 // EXTERNAL_CODECS_VARS_L
                 codecs,
