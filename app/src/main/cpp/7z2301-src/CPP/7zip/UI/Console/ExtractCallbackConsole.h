@@ -34,7 +34,7 @@ struct CErrorPathCodes2
 };
 */
 
-class CExtractScanConsole Z7_final: public IDirItemsCallback
+class CExtractScanConsole : public IDirItemsCallback
 {
   Z7_IFACE_IMP(IDirItemsCallback)
 
@@ -55,6 +55,9 @@ class CExtractScanConsole Z7_final: public IDirItemsCallback
   }
 
 public:
+
+    virtual ~CExtractScanConsole()=default;
+
 
   void Init(CStdOutStream *outStream, CStdOutStream *errorStream, CStdOutStream *percentStream)
   {
@@ -79,7 +82,7 @@ public:
 
 
 
-class CExtractCallbackConsole Z7_final:
+class CExtractCallbackConsole :
   public IFolderArchiveExtractCallback,
   public IExtractCallbackUI,
   // public IArchiveExtractCallbackMessage,

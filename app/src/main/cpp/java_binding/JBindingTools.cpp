@@ -59,140 +59,63 @@ static jobject addClassLoaderObject(JNIEnv *env, const char *name) {
 }
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *pjvm, void *reserved) {
-    JNIEnv *env = nullptr;
-    if (pjvm->GetEnv((void **) &env, JNI_VERSION_1_6) == JNI_OK) {
+    JNIEnv* env = nullptr;
+    if (pjvm->GetEnv((void**)&env, JNI_VERSION_1_6) == JNI_OK) {
         jclass classLoaderClass = env->FindClass("java/lang/ClassLoader");
-        JBindingSession::_classLoaderID = env->GetMethodID(classLoaderClass, "findClass",
-                                                           "(Ljava/lang/String;)Ljava/lang/Class;");
+        JBindingSession::_classLoaderID = env->GetMethodID(classLoaderClass, "findClass", "(Ljava/lang/String;)Ljava/lang/Class;");
         env->DeleteLocalRef(classLoaderClass);
 
-        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(PROPERTYINFO_CLASS),
-                                                                   addClassLoaderObject(env,
-                                                                                        PROPERTYINFO_CLASS)));
-        JBindingSession::_classLoaderObjects.insert(
-                std::make_pair(std::string(PROPID_CLASS), addClassLoaderObject(env, PROPID_CLASS)));
-        JBindingSession::_classLoaderObjects.insert(
-                std::make_pair(std::string(SEQUENTIALOUTSTREAM_CLASS),
-                               addClassLoaderObject(env, SEQUENTIALOUTSTREAM_CLASS)));
-        JBindingSession::_classLoaderObjects.insert(
-                std::make_pair(std::string(SEQUENTIALINSTREAM_CLASS),
-                               addClassLoaderObject(env, SEQUENTIALINSTREAM_CLASS)));
-        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(INSTREAM_CLASS),
-                                                                   addClassLoaderObject(env,
-                                                                                        INSTREAM_CLASS)));
-        JBindingSession::_classLoaderObjects.insert(
-                std::make_pair(std::string(CRYPTOGETTEXTPASSWORD_CLASS),
-                               addClassLoaderObject(env, CRYPTOGETTEXTPASSWORD_CLASS)));
-        JBindingSession::_classLoaderObjects.insert(
-                std::make_pair(std::string(ARCHIVEOPENVOLUMECALLBACK_CLASS),
-                               addClassLoaderObject(env, ARCHIVEOPENVOLUMECALLBACK_CLASS)));
-        JBindingSession::_classLoaderObjects.insert(
-                std::make_pair(std::string(EXTRACTASKMODE_CLASS),
-                               addClassLoaderObject(env, EXTRACTASKMODE_CLASS)));
-        JBindingSession::_classLoaderObjects.insert(
-                std::make_pair(std::string(EXTRACTOPERATIONRESULT_CLASS),
-                               addClassLoaderObject(env, EXTRACTOPERATIONRESULT_CLASS)));
-        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(DIRITEMCALLBACK),
-                                                                   addClassLoaderObject(env,
-                                                                                        DIRITEMCALLBACK)));
-        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(IEXTRACTCALLBACKUI),
-                                                                   addClassLoaderObject(env,
-                                                                                        IEXTRACTCALLBACKUI)));
-        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(IUPDATECALLBACK),
-                                                                   addClassLoaderObject(env,
-                                                                                        IUPDATECALLBACK)));
-        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(IUPDATEOPENCALLBACK),
-                                                                   addClassLoaderObject(env,
-                                                                                        IUPDATEOPENCALLBACK)));
-        JBindingSession::_classLoaderObjects.insert(
-                std::make_pair(std::string(IINARCHIVEVOLUMEIMPL),
-                               addClassLoaderObject(env, IINARCHIVEVOLUMEIMPL)));
+//        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(PROPERTYINFO_CLASS), addClassLoaderObject(env, PROPERTYINFO_CLASS)));
+//        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(PROPID_CLASS), addClassLoaderObject(env, PROPID_CLASS)));
+//        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(SEQUENTIALOUTSTREAM_CLASS), addClassLoaderObject(env, SEQUENTIALOUTSTREAM_CLASS)));
+//        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(SEQUENTIALINSTREAM_CLASS), addClassLoaderObject(env, SEQUENTIALINSTREAM_CLASS)));
+//        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(INSTREAM_CLASS), addClassLoaderObject(env, INSTREAM_CLASS)));
+//        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(CRYPTOGETTEXTPASSWORD_CLASS), addClassLoaderObject(env, CRYPTOGETTEXTPASSWORD_CLASS)));
+//        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(ARCHIVEOPENVOLUMECALLBACK_CLASS), addClassLoaderObject(env, ARCHIVEOPENVOLUMECALLBACK_CLASS)));
+//        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(EXTRACTASKMODE_CLASS), addClassLoaderObject(env, EXTRACTASKMODE_CLASS)));
+//        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(EXTRACTOPERATIONRESULT_CLASS), addClassLoaderObject(env, EXTRACTOPERATIONRESULT_CLASS)));
+//        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(DIRITEMCALLBACK), addClassLoaderObject(env, DIRITEMCALLBACK)));
+//        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(IEXTRACTCALLBACKUI), addClassLoaderObject(env, IEXTRACTCALLBACKUI)));
+//        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(IUPDATECALLBACK), addClassLoaderObject(env, IUPDATECALLBACK)));
+//        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(IUPDATEOPENCALLBACK), addClassLoaderObject(env, IUPDATEOPENCALLBACK)));
+//        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(IINARCHIVEVOLUMEIMPL), addClassLoaderObject(env, IINARCHIVEVOLUMEIMPL)));
 
 //        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(JAVA_PROP_ID), addClassLoaderObject(env, JAVA_PROP_ID)));
 //        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(JAVA_EXTRACT_ASK_MODE), addClassLoaderObject(env, JAVA_EXTRACT_ASK_MODE)));
 //        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(JAVA_EXTRACT_OPERATION_RESULT), addClassLoaderObject(env, JAVA_EXTRACT_OPERATION_RESULT)));
-        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(JAVA_IIN_ARCHIVE),
-                                                                   addClassLoaderObject(env,
-                                                                                        JAVA_IIN_ARCHIVE)));
-//        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(JAVA_IIN_STREAM), addClassLoaderObject(env, JAVA_IIN_STREAM)));
-        JBindingSession::_classLoaderObjects.insert(
-                std::make_pair(std::string(JAVA_ISEQUENTIAL_IN_STREAM),
-                               addClassLoaderObject(env, JAVA_ISEQUENTIAL_IN_STREAM)));
-        JBindingSession::_classLoaderObjects.insert(
-                std::make_pair(std::string(JAVA_ISEQUENTIAL_OUT_STREAM),
-                               addClassLoaderObject(env, JAVA_ISEQUENTIAL_OUT_STREAM)));
-        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(JAVA_IOUT_ARCHIVE),
-                                                                   addClassLoaderObject(env,
-                                                                                        JAVA_IOUT_ARCHIVE)));
-//        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(JAVA_IOUT_ITEM_CALLBACK_BASE), addClassLoaderObject(env, JAVA_IOUT_ITEM_CALLBACK_BASE)));
-        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(JAVA_ARCHIVE_FORMAT),
-                                                                   addClassLoaderObject(env,
-                                                                                        JAVA_ARCHIVE_FORMAT)));
-        JBindingSession::_classLoaderObjects.insert(
-                std::make_pair(std::string(JAVA_OUT_ITEM_FACTORY),
-                               addClassLoaderObject(env, JAVA_OUT_ITEM_FACTORY)));
-        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(JAVA_OUT_ITEM),
-                                                                   addClassLoaderObject(env,
-                                                                                        JAVA_OUT_ITEM)));
-        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(JAVA_IOUT_ITEM_BASE),
-                                                                   addClassLoaderObject(env,
-                                                                                        JAVA_IOUT_ITEM_BASE)));
+//        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(JAVA_IIN_ARCHIVE), addClassLoaderObject(env, JAVA_IIN_ARCHIVE)));
+////        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(JAVA_IIN_STREAM), addClassLoaderObject(env, JAVA_IIN_STREAM)));
+//        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(JAVA_ISEQUENTIAL_IN_STREAM), addClassLoaderObject(env, JAVA_ISEQUENTIAL_IN_STREAM)));
+//        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(JAVA_ISEQUENTIAL_OUT_STREAM), addClassLoaderObject(env, JAVA_ISEQUENTIAL_OUT_STREAM)));
+//        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(JAVA_IOUT_ARCHIVE), addClassLoaderObject(env, JAVA_IOUT_ARCHIVE)));
+////        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(JAVA_IOUT_ITEM_CALLBACK_BASE), addClassLoaderObject(env, JAVA_IOUT_ITEM_CALLBACK_BASE)));
+//        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(JAVA_ARCHIVE_FORMAT), addClassLoaderObject(env, JAVA_ARCHIVE_FORMAT)));
+//        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(JAVA_OUT_ITEM_FACTORY), addClassLoaderObject(env, JAVA_OUT_ITEM_FACTORY)));
+//        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(JAVA_OUT_ITEM), addClassLoaderObject(env, JAVA_OUT_ITEM)));
+//        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(JAVA_IOUT_ITEM_BASE), addClassLoaderObject(env, JAVA_IOUT_ITEM_BASE)));
+//
+//        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(SEVEN_ZIP_PACKAGE"/IArchiveOpenCallback"), addClassLoaderObject(env, SEVEN_ZIP_PACKAGE"/IArchiveOpenCallback")));
+//        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(SEVEN_ZIP_PACKAGE"/IProgress"), addClassLoaderObject(env, SEVEN_ZIP_PACKAGE"/IProgress")));
+//        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(SEVEN_ZIP_PACKAGE"/IArchiveExtractCallback"), addClassLoaderObject(env, SEVEN_ZIP_PACKAGE"/IArchiveExtractCallback")));
+//        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(SEVEN_ZIP_PACKAGE"/IOutStream"), addClassLoaderObject(env, SEVEN_ZIP_PACKAGE"/IOutStream")));
+//        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(SEVEN_ZIP_PACKAGE"/ISeekableStream"), addClassLoaderObject(env, SEVEN_ZIP_PACKAGE"/ISeekableStream")));
+//        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(SEVEN_ZIP_PACKAGE"/IOutCreateCallback"), addClassLoaderObject(env, SEVEN_ZIP_PACKAGE"/IOutCreateCallback")));
+//        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(SEVEN_ZIP_PACKAGE_IMPL"/InArchiveImpl"), addClassLoaderObject(env, SEVEN_ZIP_PACKAGE_IMPL"/InArchiveImpl")));
+//        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(SEVEN_ZIP_PACKAGE_IMPL"/OutArchiveImpl"), addClassLoaderObject(env, SEVEN_ZIP_PACKAGE_IMPL"/OutArchiveImpl")));
 
-        JBindingSession::_classLoaderObjects.insert(
-                std::make_pair(std::string(SEVEN_ZIP_PACKAGE"/IArchiveOpenCallback"),
-                               addClassLoaderObject(env,
-                                                    SEVEN_ZIP_PACKAGE"/IArchiveOpenCallback")));
-        JBindingSession::_classLoaderObjects.insert(
-                std::make_pair(std::string(SEVEN_ZIP_PACKAGE"/IProgress"),
-                               addClassLoaderObject(env, SEVEN_ZIP_PACKAGE"/IProgress")));
-        JBindingSession::_classLoaderObjects.insert(
-                std::make_pair(std::string(SEVEN_ZIP_PACKAGE"/IArchiveExtractCallback"),
-                               addClassLoaderObject(env,
-                                                    SEVEN_ZIP_PACKAGE"/IArchiveExtractCallback")));
-        JBindingSession::_classLoaderObjects.insert(
-                std::make_pair(std::string(SEVEN_ZIP_PACKAGE"/IOutStream"),
-                               addClassLoaderObject(env, SEVEN_ZIP_PACKAGE"/IOutStream")));
-        JBindingSession::_classLoaderObjects.insert(
-                std::make_pair(std::string(SEVEN_ZIP_PACKAGE"/ISeekableStream"),
-                               addClassLoaderObject(env, SEVEN_ZIP_PACKAGE"/ISeekableStream")));
-        JBindingSession::_classLoaderObjects.insert(
-                std::make_pair(std::string(SEVEN_ZIP_PACKAGE"/IOutCreateCallback"),
-                               addClassLoaderObject(env, SEVEN_ZIP_PACKAGE"/IOutCreateCallback")));
-        JBindingSession::_classLoaderObjects.insert(
-                std::make_pair(std::string(SEVEN_ZIP_PACKAGE_IMPL"/InArchiveImpl"),
-                               addClassLoaderObject(env, SEVEN_ZIP_PACKAGE_IMPL"/InArchiveImpl")));
-        JBindingSession::_classLoaderObjects.insert(
-                std::make_pair(std::string(SEVEN_ZIP_PACKAGE_IMPL"/OutArchiveImpl"),
-                               addClassLoaderObject(env, SEVEN_ZIP_PACKAGE_IMPL"/OutArchiveImpl")));
-
-        JBindingSession::_classLoaderObjects.insert(
-                std::make_pair(std::string(JAVA_OBJECT), addClassLoaderObject(env, JAVA_OBJECT)));
-        JBindingSession::_classLoaderObjects.insert(
-                std::make_pair(std::string(JAVA_BYTE), addClassLoaderObject(env, JAVA_BYTE)));
-        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(JAVA_CHARACTER),
-                                                                   addClassLoaderObject(env,
-                                                                                        JAVA_CHARACTER)));
-        JBindingSession::_classLoaderObjects.insert(
-                std::make_pair(std::string(JAVA_SHORT), addClassLoaderObject(env, JAVA_SHORT)));
-        JBindingSession::_classLoaderObjects.insert(
-                std::make_pair(std::string(JAVA_NUMBER), addClassLoaderObject(env, JAVA_NUMBER)));
-        JBindingSession::_classLoaderObjects.insert(
-                std::make_pair(std::string(JAVA_INTEGER), addClassLoaderObject(env, JAVA_INTEGER)));
-        JBindingSession::_classLoaderObjects.insert(
-                std::make_pair(std::string(JAVA_LONG), addClassLoaderObject(env, JAVA_LONG)));
-        JBindingSession::_classLoaderObjects.insert(
-                std::make_pair(std::string(JAVA_FLOAT), addClassLoaderObject(env, JAVA_FLOAT)));
-        JBindingSession::_classLoaderObjects.insert(
-                std::make_pair(std::string(JAVA_DOUBLE), addClassLoaderObject(env, JAVA_DOUBLE)));
-        JBindingSession::_classLoaderObjects.insert(
-                std::make_pair(std::string(JAVA_BOOLEAN), addClassLoaderObject(env, JAVA_BOOLEAN)));
-        JBindingSession::_classLoaderObjects.insert(
-                std::make_pair(std::string(JAVA_STRING), addClassLoaderObject(env, JAVA_STRING)));
-        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(JAVA_THROWABLE),
-                                                                   addClassLoaderObject(env,
-                                                                                        JAVA_THROWABLE)));
-        JBindingSession::_classLoaderObjects.insert(
-                std::make_pair(std::string(JAVA_DATE), addClassLoaderObject(env, JAVA_DATE)));
+        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(JAVA_OBJECT), addClassLoaderObject(env, JAVA_OBJECT)));
+        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(JAVA_BYTE), addClassLoaderObject(env, JAVA_BYTE)));
+        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(JAVA_CHARACTER), addClassLoaderObject(env, JAVA_CHARACTER)));
+        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(JAVA_SHORT), addClassLoaderObject(env, JAVA_SHORT)));
+        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(JAVA_NUMBER), addClassLoaderObject(env, JAVA_NUMBER)));
+        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(JAVA_INTEGER), addClassLoaderObject(env, JAVA_INTEGER)));
+        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(JAVA_LONG), addClassLoaderObject(env, JAVA_LONG)));
+        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(JAVA_FLOAT), addClassLoaderObject(env, JAVA_FLOAT)));
+        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(JAVA_DOUBLE), addClassLoaderObject(env, JAVA_DOUBLE)));
+        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(JAVA_BOOLEAN), addClassLoaderObject(env, JAVA_BOOLEAN)));
+        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(JAVA_STRING), addClassLoaderObject(env, JAVA_STRING)));
+        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(JAVA_THROWABLE), addClassLoaderObject(env, JAVA_THROWABLE)));
+        JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string(JAVA_DATE), addClassLoaderObject(env, JAVA_DATE)));
 
 #ifdef NATIVE_JUNIT_TEST_SUPPORT
         JBindingSession::_classLoaderObjects.insert(std::make_pair(std::string("net/sf/sevenzipjbinding/junit/jbindingtools/Callback1"), addClassLoaderObject(env, "net/sf/sevenzipjbinding/junit/jbindingtools/Callback1")));

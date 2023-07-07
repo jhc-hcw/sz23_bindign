@@ -367,7 +367,7 @@ Java_com_xz_szbinding_MainActivity_compress2(JNIEnv *env, jobject thiz, jobjectA
 
     char arg0[] = "7z";
     char arg1[] = "l";
-    char arg2[] = "/storage/emulated/0/test5/nameunlock.7z";
+    char arg2[] = "/storage/emulated/0/test5/mk.gz";
     char arg3[] = "-o/storage/emulated/0/test4";
     char arg4[] = "-p1234";
     char arg5[] = "-y";

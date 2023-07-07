@@ -1697,4 +1697,315 @@ FString GetModuleDirPrefix()
 
 }}
 
+HRESULT GetArchive(
+        // DECL_EXTERNAL_CODECS_LOC_VARS
+        CCodecs *codecs,
+        const CObjectVector<COpenType> &types, //不需要
+        const CIntVector &excludedFormats,   //需要
+        UStringVector &arcPaths, UStringVector &arcPathsFull,
+        const NWildcard::CCensorNode &wildcardCensor,
+        const CExtractOptions &options,
+        IOpenCallbackUI *openCallback,
+        IExtractCallbackUI *extractCallback,
+        IFolderArchiveExtractCallback *faeCallback,
+#ifndef Z7_SFX
+        IHashCalc *hash,
+#endif
+        UString &errorMessage,
+        CDecompressStat &st,
+        AResult *aResult
+        ) {
+  st.Clear();
+  UInt64 totalPackSize = 0;
+  CRecordVector<UInt64> arcSizes;
+
+  unsigned numArcs = options.StdInMode ? 1 : arcPaths.Size();
+
+  unsigned i;
+
+  for (i = 0; i < numArcs; i++)
+  {
+    NFind::CFileInfo fi;
+    fi.Size = 0;
+    if (!options.StdInMode)
+    {
+      const FString arcPath = us2fs(arcPaths[i]);
+      if (!fi.Find_FollowLink(arcPath))
+      {
+        const HRESULT errorCode = GetLastError_noZero_HRESULT();
+        SetErrorMessage("Cannot find archive file", arcPath, errorCode, errorMessage);
+        return errorCode;
+      }
+      if (fi.IsDir())
+      {
+        HRESULT errorCode = E_FAIL;
+        SetErrorMessage("The item is a directory", arcPath, errorCode, errorMessage);
+        return errorCode;
+      }
+    }
+    arcSizes.Add(fi.Size);
+    totalPackSize += fi.Size;
+  }
+
+  CBoolArr skipArcs(numArcs);
+  for (i = 0; i < numArcs; i++)
+    skipArcs[i] = false;
+
+  CArchiveExtractCallback *ecs = new CArchiveExtractCallback;//两个回调
+ // CMyComPtr<IArchiveExtractCallback> ec(ecs); //可以不要；
+
+  const bool multi = (numArcs > 1);
+
+  ecs->InitForMulti(multi,
+                    options.PathMode,
+                    options.OverwriteMode,
+                    options.ZoneMode,
+                    false // keepEmptyDirParts
+  );
+#ifndef Z7_SFX
+  ecs->SetHashMethods(hash);
+#endif
+
+  if (multi)
+  {
+    RINOK(faeCallback->SetTotal(totalPackSize))
+  }
+
+  UInt64 totalPackProcessed = 0;
+  bool thereAreNotOpenArcs = false;
+
+  for (i = 0; i < numArcs; i++)
+  {
+    if (skipArcs[i])
+      continue;
+
+    ecs->InitBeforeNewArchive();
+
+    const UString &arcPath = arcPaths[i];
+    NFind::CFileInfo fi;
+    if (options.StdInMode)
+    {
+      // do we need ctime and mtime?
+      fi.ClearBase();
+      fi.Size = 0; // (UInt64)(Int64)-1;
+      fi.SetAsFile();
+      // NTime::GetCurUtc_FiTime(fi.MTime);
+      // fi.CTime = fi.ATime = fi.MTime;
+    }
+    else
+    {
+      if (!fi.Find_FollowLink(us2fs(arcPath)) || fi.IsDir())
+      {
+        const HRESULT errorCode = GetLastError_noZero_HRESULT();
+        SetErrorMessage("Cannot find archive file", us2fs(arcPath), errorCode, errorMessage);
+        return errorCode;
+      }
+    }
+
+    /*
+    #ifndef Z7_NO_CRYPTO
+    openCallback->Open_Clear_PasswordWasAsked_Flag();
+    #endif
+    */
+
+    RINOK(extractCallback->BeforeOpen(arcPath, options.TestMode))
+    CArchiveLink *archiveLinkPtr = new CArchiveLink;
+    CArchiveLink &arcLink = *archiveLinkPtr;   //变为指针
+
+    CObjectVector<COpenType> *types2 = new CObjectVector<COpenType>(types);
+    /*
+    #ifndef Z7_SFX
+    if (types.IsEmpty())
+    {
+      int pos = arcPath.ReverseFind(L'.');
+      if (pos >= 0)
+      {
+        UString s = arcPath.Ptr(pos + 1);
+        int index = codecs->FindFormatForExtension(s);
+        if (index >= 0 && s == L"001")
+        {
+          s = arcPath.Left(pos);
+          pos = s.ReverseFind(L'.');
+          if (pos >= 0)
+          {
+            int index2 = codecs->FindFormatForExtension(s.Ptr(pos + 1));
+            if (index2 >= 0) // && s.CompareNoCase(L"rar") != 0
+            {
+              types2.Add(index2);
+              types2.Add(index);
+            }
+          }
+        }
+      }
+    }
+    #endif
+    */
+
+    COpenOptions op;
+#ifndef Z7_SFX
+    op.props = &options.Properties;
+#endif
+    op.codecs = codecs;
+    op.types = types2;
+    op.excludedFormats = &excludedFormats;
+    op.stdInMode = options.StdInMode;
+    op.stream = NULL;
+    op.filePath = arcPath;
+
+    HRESULT result = arcLink.Open_Strict(op, openCallback);
+
+    if (result == E_ABORT)
+      return result;
+
+    // arcLink.Set_ErrorsText();
+    RINOK(extractCallback->OpenResult(codecs, arcLink, arcPath, result))
+
+    if (result != S_OK)
+    {
+      thereAreNotOpenArcs = true;
+      if (!options.StdInMode)
+        totalPackProcessed += fi.Size;
+      continue;
+    }
+
+#if defined(_WIN32) && !defined(UNDER_CE) && !defined(Z7_SFX)
+    if (options.ZoneMode != NExtract::NZoneIdMode::kNone
+        && !options.StdInMode)
+    {
+      ReadZoneFile_Of_BaseFile(us2fs(arcPath), ecs->ZoneBuf);
+    }
+#endif
+
+
+    if (arcLink.Arcs.Size() != 0)
+    {
+      if (arcLink.GetArc()->IsHashHandler(op))
+      {
+        if (!options.TestMode)
+        {
+          /* real Extracting to files is possible.
+             But user can think that hash archive contains real files.
+             So we block extracting here. */
+          // v23.00 : we don't break process.
+          RINOK(extractCallback->OpenResult(codecs, arcLink, arcPath, E_NOTIMPL))
+          thereAreNotOpenArcs = true;
+          if (!options.StdInMode)
+            totalPackProcessed += fi.Size;
+          continue;
+          // return E_NOTIMPL; // before v23
+        }
+        FString dirPrefix = us2fs(options.HashDir);
+        if (dirPrefix.IsEmpty())
+        {
+          if (!NFile::NDir::GetOnlyDirPrefix(us2fs(arcPath), dirPrefix))
+          {
+            // return GetLastError_noZero_HRESULT();
+          }
+        }
+        if (!dirPrefix.IsEmpty())
+          NName::NormalizeDirPathPrefix(dirPrefix);
+        ecs->DirPathPrefix_for_HashFiles = dirPrefix;
+      }
+    }
+
+    if (!options.StdInMode)
+    {
+      // numVolumes += arcLink.VolumePaths.Size();
+      // arcLink.VolumesSize;
+
+      // totalPackSize -= DeleteUsedFileNamesFromList(arcLink, i + 1, arcPaths, arcPathsFull, &arcSizes);
+      // numArcs = arcPaths.Size();
+      if (arcLink.VolumePaths.Size() != 0)
+      {
+        Int64 correctionSize = (Int64)arcLink.VolumesSize;
+        FOR_VECTOR (v, arcLink.VolumePaths)
+        {
+          int index = Find_FileName_InSortedVector(arcPathsFull, arcLink.VolumePaths[v]);
+          if (index >= 0)
+          {
+            if ((unsigned)index > i)
+            {
+              skipArcs[(unsigned)index] = true;
+              correctionSize -= arcSizes[(unsigned)index];
+            }
+          }
+        }
+        if (correctionSize != 0)
+        {
+          Int64 newPackSize = (Int64)totalPackSize + correctionSize;
+          if (newPackSize < 0)
+            newPackSize = 0;
+          totalPackSize = (UInt64)newPackSize;
+          RINOK(faeCallback->SetTotal(totalPackSize))
+        }
+      }
+    }
+
+    /*
+    // Now openCallback and extractCallback use same object. So we don't need to send password.
+
+    #ifndef Z7_NO_CRYPTO
+    bool passwordIsDefined;
+    UString password;
+    RINOK(openCallback->Open_GetPasswordIfAny(passwordIsDefined, password))
+    if (passwordIsDefined)
+    {
+      RINOK(extractCallback->SetPassword(password))
+    }
+    #endif
+    */
+
+    CArc &arc = arcLink.Arcs.Back();
+    arc.MTime.Def = !options.StdInMode
+#ifdef _WIN32
+      && !fi.IsDevice
+#endif
+            ;
+    if (arc.MTime.Def)
+      arc.MTime.Set_From_FiTime(fi.MTime);
+
+    UInt64 packProcessed;
+    const bool calcCrc =
+#ifndef Z7_SFX
+            (hash != NULL);
+#else
+    false;
+#endif
+
+    RINOK(DecompressArchive(
+            codecs,
+            arcLink,
+            fi.Size + arcLink.VolumesSize,
+            wildcardCensor,
+            options,
+            calcCrc,
+            extractCallback, faeCallback, ecs,
+            errorMessage, packProcessed))
+
+    if (!options.StdInMode)
+      packProcessed = fi.Size + arcLink.VolumesSize;
+    totalPackProcessed += packProcessed;
+    ecs->LocalProgressSpec->InSize += packProcessed;
+    ecs->LocalProgressSpec->OutSize = ecs->UnpackSize;
+    if (!errorMessage.IsEmpty())
+      return E_FAIL;
+  }
+
+  if (multi || thereAreNotOpenArcs)
+  {
+    RINOK(faeCallback->SetTotal(totalPackSize))
+    RINOK(faeCallback->SetCompleted(&totalPackProcessed))
+  }
+
+  st.NumFolders = ecs->NumFolders;
+  st.NumFiles = ecs->NumFiles;
+  st.NumAltStreams = ecs->NumAltStreams;
+  st.UnpackSize = ecs->UnpackSize;
+  st.AltStreams_UnpackSize = ecs->AltStreams_UnpackSize;
+  st.NumArchives = arcPaths.Size();
+  st.PackSize = ecs->LocalProgressSpec->InSize;
+  return S_OK;
+}
+
+
 #endif // ! _WIN32

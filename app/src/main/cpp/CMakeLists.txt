@@ -542,6 +542,7 @@ add_definitions(
         -Wno-conversion
         -fPIC
         -Wno-gnu-zero-variadic-macro-arguments
+        -Wno-unused-function
 
 )
 

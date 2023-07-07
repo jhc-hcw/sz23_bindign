@@ -103,4 +103,22 @@ HRESULT Extract(
     UString &errorMessage,
     CDecompressStat &st);
 
+void SetErrorMessage(const char *message,
+                            const FString &path, HRESULT errorCode,
+                            UString &s);
+int Find_FileName_InSortedVector(const UStringVector &fileNames, const UString &name);
+HRESULT DecompressArchive(
+        CCodecs *codecs,
+        const CArchiveLink &arcLink,
+        UInt64 packSize,
+        const NWildcard::CCensorNode &wildcardCensor,
+        const CExtractOptions &options,
+        bool calcCrc,
+        IExtractCallbackUI *callback,
+        IFolderArchiveExtractCallback *callbackFAE,
+        CArchiveExtractCallback *ecs,
+        UString &errorMessage,
+        UInt64 &stdInProcessed);
+
+
 #endif

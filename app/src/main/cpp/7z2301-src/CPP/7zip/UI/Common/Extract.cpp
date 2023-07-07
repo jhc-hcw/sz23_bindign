@@ -23,7 +23,7 @@ using namespace NFile;
 using namespace NDir;
 
 
-static void SetErrorMessage(const char *message,
+void SetErrorMessage(const char *message,
     const FString &path, HRESULT errorCode,
     UString &s)
 {
@@ -35,7 +35,7 @@ static void SetErrorMessage(const char *message,
 }
 
 
-static HRESULT DecompressArchive(
+HRESULT DecompressArchive(
     CCodecs *codecs,
     const CArchiveLink &arcLink,
     UInt64 packSize,
@@ -240,7 +240,7 @@ static HRESULT DecompressArchive(
    Sorted list for file paths was sorted with case insensitive compare function.
    But FindInSorted function did binary search via case sensitive compare function */
 
-int Find_FileName_InSortedVector(const UStringVector &fileNames, const UString &name);
+
 int Find_FileName_InSortedVector(const UStringVector &fileNames, const UString &name)
 {
   unsigned left = 0, right = fileNames.Size();
@@ -568,3 +568,4 @@ HRESULT Extract(
   st.PackSize = ecs->LocalProgressSpec->InSize;
   return S_OK;
 }
+

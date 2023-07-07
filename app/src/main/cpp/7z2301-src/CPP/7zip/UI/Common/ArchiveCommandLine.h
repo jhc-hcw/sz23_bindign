@@ -11,6 +11,7 @@
 #include "Extract.h"
 #include "HashCalc.h"
 #include "Update.h"
+#include "Extract.h"
 
 typedef CMessagePathException CArcCmdLineException;
 
@@ -156,5 +157,45 @@ public:
   void Parse1(const UStringVector &commandStrings, CArcCmdLineOptions &options);
   void Parse2(CArcCmdLineOptions &options);
 };
+
+struct AResult{
+public:
+    HRESULT result;
+    CArcCmdLineOptions * opt;
+    COpenOptions *cOpenOptions;
+    CIntVector *excludedFormatsPtr;
+    IExtractCallbackUI *cal2;
+    CArchiveLink *arcLink;
+    UStringVector *pArchivePathsFullSorted;
+    UStringVector *pArchivePathsSorted;
+    const char* message;
+
+    ~AResult(){
+      delete opt;
+      delete excludedFormatsPtr;
+      //delete cal1;
+      //delete cal2;
+      delete arcLink;
+      delete pArchivePathsFullSorted;
+      delete pArchivePathsSorted;
+    }
+};
+
+HRESULT GetArchive(
+        // DECL_EXTERNAL_CODECS_LOC_VARS
+        CCodecs *codecs,
+        const CObjectVector<COpenType> &types,
+        const CIntVector &excludedFormats,
+        UStringVector &arcPaths, UStringVector &arcPathsFull,
+        const NWildcard::CCensorNode &wildcardCensor,
+        const CExtractOptions &options,
+        IOpenCallbackUI *openCallback,
+        IExtractCallbackUI *extractCallback,
+        IFolderArchiveExtractCallback *faeCallback,
+#ifndef Z7_SFX
+        IHashCalc *hash,
+#endif
+        UString &errorMessage,
+        CDecompressStat &st, AResult *aResult);
 
 #endif
