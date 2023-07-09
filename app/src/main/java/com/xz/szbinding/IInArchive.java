@@ -95,38 +95,6 @@ public interface IInArchive extends Closeable {
     public void extract(int[] indices, boolean testMode, IArchiveExtractCallback extractCallback)
             throws SevenZipException;
 
-    /**
-     * Extract one item from archive. Multiple calls of this method are inefficient for some archive types.
-     * 
-     * @param index
-     *            index of the item to extract. 0 - first archive item.
-     * @param outStream
-     *            sequential output stream to get content of the item
-     * @return result status of the extraction
-     * 
-     * @throws SevenZipException
-     *             7-Zip or 7-Zip-JBinding error occur. Use {@link SevenZipException#printStackTraceExtended()} to get
-     *             stack traces of this SevenZipException and of the all thrown 'cause by' exceptions.
-     */
-    public ExtractOperationResult extractSlow(int index, ISequentialOutStream outStream) throws SevenZipException;
-
-    /**
-     * Extract one item from archive. Multiple calls of this method are inefficient for some archive types.
-     * 
-     * @param index
-     *            index of the item to extract. 0 - first archive item.
-     * @param outStream
-     *            sequential output stream to get content of the item
-     * @param password
-     *            password to use
-     * @return result status of the extraction
-     * 
-     * @throws SevenZipException
-     *             7-Zip or 7-Zip-JBinding error occur. Use {@link SevenZipException#printStackTraceExtended()} to get
-     *             stack traces of this SevenZipException and of the all thrown 'cause by' exceptions.
-     */
-    public ExtractOperationResult extractSlow(int index, ISequentialOutStream outStream, String password)
-            throws SevenZipException;
 
     /**
      * Get value of archive property <code>propID</code>.

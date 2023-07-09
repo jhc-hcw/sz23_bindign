@@ -76,7 +76,7 @@
 #define IUPDATEOPENCALLBACK "net/sf/sevenzipjbinding/IUpdateOpenCallback"
 #define IUPDATEOPENCALLBACK_CLASS_T    JAVA_MAKE_SIGNATURE_TYPE(IUPDATEOPENCALLBACK)
 
-#define IINARCHIVEVOLUMEIMPL "net/sf/sevenzipjbinding/impl/InArchiveVolumeImpl"
+#define IINARCHIVEVOLUMEIMPL "net/sf/sevenzipjbinding/impl/InArchiveImpl"
 #define IINARCHIVEVOLUMEIMPL_CLASS_T JAVA_MAKE_SIGNATURE_TYPE(IINARCHIVEVOLUMEIMPL)
 
 #define FATAL fatal
